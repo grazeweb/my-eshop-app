@@ -80,29 +80,6 @@ export default function Home() {
           ))}
         </div>
       </section>
-
-      <section className="container mx-auto px-4">
-        <div className="bg-card rounded-lg shadow-md p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="text-center md:text-left">
-            <h3 className="text-2xl md:text-3xl font-bold font-headline">Stay in the Loop</h3>
-            <p className="text-muted-foreground mt-2">
-              Subscribe to our newsletter for the latest updates, deals, and more.
-            </p>
-          </div>
-          <form className="w-full md:w-auto md:max-w-md flex gap-2">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-grow"
-              aria-label="Email for newsletter"
-            />
-            <Button type="submit">
-              <Mail className="md:hidden" />
-              <span className="hidden md:block">Subscribe</span>
-            </Button>
-          </form>
-        </div>
-      </section>
     </div>
   );
 }
