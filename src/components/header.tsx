@@ -4,13 +4,21 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, ShoppingCart, User, Sun, Search } from 'lucide-react';
+import { Menu, ShoppingCart, User, Sun, Search, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -20,6 +28,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
+import { useAuth } from '@/contexts/auth-context';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const apparelComponents: { title: string; href: string; description: string }[] = [
   {
@@ -70,6 +80,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
+  const { user, logout } = useAuth();
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,9 +89,18 @@ export function Header() {
     }
   };
 
+  const getAvatarFallback = (name?: string | null) => {
+    if (!name) return 'U';
+    const parts = name.split(' ').filter(Boolean);
+    if (parts.length > 1) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container mx-auto flex h-16 items-center px-4">
+      <div className="container mx-auto flex h-16 items-center px-4 md:px-6 lg:px-8">
         {/* Mobile Header */}
         <div className="flex w-full items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center space-x-2">
@@ -94,10 +114,11 @@ export function Header() {
                 </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="flex flex-col">
-                    <Link href="/" className="flex items-center space-x-2 mb-6">
-                        <span className="font-bold text-xl">eShop</span>
-                    </Link>
-                    
+                    <SheetClose asChild>
+                        <Link href="/" className="flex items-center space-x-2 mb-6">
+                            <span className="font-bold text-xl">eShop</span>
+                        </Link>
+                    </SheetClose>
                     <div className="flex-grow">
                       <Accordion type="multiple" className="w-full flex flex-col">
                         <AccordionItem value="apparel">
@@ -152,8 +173,8 @@ export function Header() {
                             </Link>
                         </SheetClose>
                         <SheetClose asChild>
-                            <Link href="/" className="block text-lg text-muted-foreground transition-colors hover:text-foreground py-4 border-b">
-                                Home
+                            <Link href="/contact" className="block text-lg text-muted-foreground transition-colors hover:text-foreground py-4 border-b">
+                                Contact
                             </Link>
                         </SheetClose>
                       </Accordion>
@@ -173,7 +194,31 @@ export function Header() {
                         <div className="flex items-center justify-around">
                             <Button variant="ghost" size="icon" asChild><Link href="/cart"><ShoppingCart className="h-5 w-5" /><span className="sr-only">Cart</span></Link></Button>
                             <Button variant="ghost" size="icon"><Sun className="h-5 w-5" /><span className="sr-only">Toggle Theme</span></Button>
-                            <Button variant="ghost" size="icon" asChild><Link href="/account"><User className="h-5 w-5" /><span className="sr-only">Account</span></Link></Button>
+                             {user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User'} />
+                                                <AvatarFallback>{getAvatarFallback(user.displayName)}</AvatarFallback>
+                                            </Avatar>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <SheetClose asChild><DropdownMenuItem asChild><Link href="/account">Profile</Link></DropdownMenuItem></SheetClose>
+                                        <DropdownMenuItem onClick={logout}>
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            <span>Log out</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <SheetClose asChild>
+                                    <Button variant="ghost" size="icon" asChild><Link href="/login"><User className="h-5 w-5" /><span className="sr-only">Account</span></Link></Button>
+                                </SheetClose>
+                            )}
                         </div>
                     </div>
                 </SheetContent>
@@ -260,9 +305,9 @@ export function Header() {
                       </Link>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <Link href="/" legacyBehavior passHref>
+                       <Link href="/contact" legacyBehavior passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                          Home
+                          Contact
                         </NavigationMenuLink>
                       </Link>
                     </NavigationMenuItem>
@@ -290,12 +335,34 @@ export function Header() {
                     <Sun className="h-5 w-5" />
                     <span className="sr-only">Toggle theme</span>
                 </Button>
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/account">
+                {user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                       <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? ''} />
+                            <AvatarFallback>{getAvatarFallback(user.displayName)}</AvatarFallback>
+                          </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild><Link href="/account">Profile</Link></DropdownMenuItem>
+                      <DropdownMenuItem onClick={logout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href="/login">
                       <User className="h-5 w-5" />
                       <span className="sr-only">User Account</span>
                     </Link>
-                </Button>
+                  </Button>
+                )}
             </div>
         </div>
       </div>
