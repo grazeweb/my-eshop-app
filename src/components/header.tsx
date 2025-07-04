@@ -3,10 +3,9 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, ShoppingCart, User, Sun, Search, ChevronDown, LogOut } from 'lucide-react';
+import { Menu, ShoppingCart, User, Sun, Search, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import {
@@ -32,7 +31,7 @@ export function Header() {
       router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
     }
   };
-
+  
   const getAvatarFallback = (name?: string | null) => {
     if (!name) return 'A';
     const parts = name.split(' ').filter(Boolean);
@@ -44,39 +43,24 @@ export function Header() {
 
   const navLinks = [
     { href: '/products', label: 'All Products' },
-    { 
-      label: 'Apparel',
-      href: '/products?category=apparel',
-    },
-    { 
-      label: 'Accessories',
-      href: '/products?category=accessories',
-    },
+    { href: '/products?category=apparel', label: 'Apparel' },
+    { href: '/products?category=accessories', label: 'Accessories' },
     { href: '/products?category=footwear', label: 'Footwear' },
     { href: '/', label: 'Home' },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/" className="mr-4 flex items-center gap-2">
             <span className="font-bold text-lg">eShop</span>
           </Link>
-          <nav className="hidden lg:flex items-center gap-4">
+          <nav className="hidden lg:flex items-center gap-6">
             {navLinks.map(link => (
-                link.href ? (
-                    <Link key={link.label} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
-                        {link.label}
-                    </Link>
-                ) : (
-                    <DropdownMenu key={link.label}>
-                        <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus:outline-none">
-                            {link.label} <ChevronDown className="h-4 w-4" />
-                        </DropdownMenuTrigger>
-                        {/* Dropdown content can be added here if needed in the future */}
-                    </DropdownMenu>
-                )
+              <Link key={link.label} href={link.href} className="text-base font-medium text-foreground/80 transition-colors hover:text-foreground">
+                {link.label}
+              </Link>
             ))}
           </nav>
         </div>
@@ -99,7 +83,7 @@ export function Header() {
                     <nav className="flex flex-col gap-4">
                         {navLinks.map(link => (
                             <SheetClose asChild key={link.label}>
-                                <Link href={link.href ?? '#'} className="text-lg text-muted-foreground transition-colors hover:text-foreground">
+                                <Link href={link.href ?? '#'} className="text-lg text-foreground/80 transition-colors hover:text-foreground">
                                     {link.label}
                                 </Link>
                             </SheetClose>
@@ -109,8 +93,8 @@ export function Header() {
             </Sheet>
         </div>
 
-        <div className="hidden lg:flex items-center gap-2">
-            <form onSubmit={handleSearch} className="relative">
+        <div className="flex items-center gap-2">
+            <form onSubmit={handleSearch} className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                     type="search"
@@ -126,10 +110,27 @@ export function Header() {
                     <span className="sr-only">Shopping Cart</span>
                 </Link>
             </Button>
-            <Button variant="ghost" size="icon">
-                <Sun className="h-5 w-5" />
-                <span className="sr-only">Toggle theme</span>
-            </Button>
+            {/* Mobile search */}
+            <Sheet>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="md:hidden">
+                        <Search className="h-5 w-5" />
+                        <span className="sr-only">Search</span>
+                    </Button>
+                </SheetTrigger>
+                <SheetContent side="top" className="p-4">
+                    <form onSubmit={handleSearch} className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            placeholder="Search products..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10"
+                        />
+                    </form>
+                </SheetContent>
+            </Sheet>
             {user ? (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -151,10 +152,9 @@ export function Header() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             ) : (
-                <Button variant="ghost" size="icon" asChild>
+                <Button variant="ghost" asChild>
                     <Link href="/login">
-                        <User className="h-5 w-5" />
-                        <span className="sr-only">User Account</span>
+                        Login
                     </Link>
                 </Button>
             )}
