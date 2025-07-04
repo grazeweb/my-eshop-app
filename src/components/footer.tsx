@@ -46,7 +46,7 @@ export function Footer() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Link href="/" className="flex items-center space-x-2 text-foreground">
                     <Package className="h-5 w-5" />
-                    <span className="font-bold">ShopEase</span>
+                    <span className="font-bold">eShop</span>
                 </Link>
                 <span>&copy; {new Date().getFullYear()}</span>
             </div>

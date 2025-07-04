@@ -2,7 +2,7 @@
 
 const mockPolicies = {
     terms: `Generated Terms & Conditions:
-1.  **Acceptance of Terms**: By accessing and using ShopEase, you agree to be bound by these Terms and Conditions.
+1.  **Acceptance of Terms**: By accessing and using eShop, you agree to be bound by these Terms and Conditions.
 2.  **User Accounts**: To access certain features, you must register for an account. You are responsible for maintaining the confidentiality of your account information.
 3.  **Product Information**: We strive to be as accurate as possible in product descriptions. However, we do not warrant that product descriptions are error-free.
 4.  **Governing Law**: These terms shall be governed by the laws of the land.`,

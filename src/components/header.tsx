@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, ShoppingCart, User, Package } from 'lucide-react';
+import { Menu, ShoppingCart, User, Package, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { Input } from '@/components/ui/input';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -19,18 +20,13 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        {/* Left Part: Logo */}
-        <div className="mr-auto flex items-center">
+      <div className="container flex h-16 items-center">
+        <div className="flex w-full items-center justify-start md:w-1/3">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Package className="h-6 w-6" />
-            <span className="font-bold">ShopEase</span>
+            <span className="font-bold">eShop</span>
           </Link>
-        </div>
-
-        {/* Right Part: Desktop Nav, Icons, and Mobile Menu */}
-        <div className="flex items-center space-x-2">
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium mr-4">
+          <nav className="hidden items-center space-x-6 text-sm font-medium lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -44,7 +40,20 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          
+        </div>
+
+        <div className="hidden w-1/3 flex-1 items-center justify-center md:flex">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="w-full rounded-md bg-muted pl-10"
+            />
+          </div>
+        </div>
+        
+        <div className="flex w-auto items-center justify-end space-x-2 md:w-1/3">
           <Button variant="ghost" size="icon" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
@@ -58,10 +67,9 @@ export function Header() {
             </Link>
           </Button>
           
-          {/* Mobile Nav */}
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle Menu</span>
               </Button>
@@ -69,8 +77,12 @@ export function Header() {
             <SheetContent side="right">
               <Link href="/" className="flex items-center space-x-2 mb-6">
                 <Package className="h-6 w-6" />
-                <span className="font-bold">ShopEase</span>
+                <span className="font-bold">eShop</span>
               </Link>
+               <div className="relative mb-6">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input type="search" placeholder="Search..." className="w-full bg-muted pl-10" />
+               </div>
               <div className="flex flex-col space-y-3">
                 {navLinks.map((link) => (
                   <SheetClose asChild key={link.href}>

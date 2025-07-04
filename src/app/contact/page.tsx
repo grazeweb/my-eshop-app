@@ -50,7 +50,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold">Address</h3>
-                <p className="text-muted-foreground">123 ShopEase St, Commerce City, 45678</p>
+                <p className="text-muted-foreground">123 eShop St, Commerce City, 45678</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
@@ -59,7 +59,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold">Email</h3>
-                <p className="text-muted-foreground">support@shopease.com</p>
+                <p className="text-muted-foreground">support@eshop.com</p>
               </div>
             </div>
             <div className="flex items-start gap-4">

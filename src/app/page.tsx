@@ -1,46 +1,10 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ArrowRight, Mail } from 'lucide-react';
 import { featuredProducts } from '@/lib/data';
-import { Product } from '@/lib/types';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-
-function ProductCard({ product }: { product: Product }) {
-  return (
-    <Card className="flex flex-col overflow-hidden transition-transform transform hover:-translate-y-1 hover:shadow-xl">
-      <CardHeader className="p-0">
-        <Link href={`/products/${product.id}`} className="block">
-          <div className="relative h-48 w-full">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              style={{ objectFit: 'cover' }}
-              data-ai-hint="product image"
-            />
-          </div>
-        </Link>
-      </CardHeader>
-      <CardContent className="p-4 flex-grow">
-        <Link href={`/products/${product.id}`}>
-          <CardTitle className="text-lg font-medium hover:text-primary">{product.name}</CardTitle>
-        </Link>
-        <p className="text-muted-foreground text-sm mt-1">
-          {product.description.substring(0, 60)}...
-        </p>
-      </CardContent>
-      <CardFooter className="p-4 pt-0 flex justify-between items-center">
-        <p className="font-semibold text-xl">${product.price.toFixed(2)}</p>
-        <Button asChild>
-          <Link href={`/products/${product.id}`}>View</Link>
-        </Button>
-      </CardFooter>
-    </Card>
-  );
-}
+import { ProductCard } from '@/components/product-card';
 
 export default function Home() {
   return (

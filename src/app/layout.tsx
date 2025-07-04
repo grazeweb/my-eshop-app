@@ -5,7 +5,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'ShopEase - Your one-stop shop',
+  title: 'eShop - Your one-stop shop',
   description: 'A modern e-commerce platform built with Next.js.',
 };
 
