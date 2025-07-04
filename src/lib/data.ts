@@ -1,4 +1,4 @@
-import type { Product, Category, Order } from './types';
+import type { Product, Category, Order, Review } from './types';
 
 export const categories: Category[] = [
   { id: 'electronics', name: 'Electronics' },
@@ -9,6 +9,63 @@ export const categories: Category[] = [
   { id: 'footwear', name: 'Footwear' },
 ];
 
+const productReviews: { [key: string]: Review[] } = {
+  '1': [
+    {
+      id: 'rev1',
+      author: 'Alice Johnson',
+      avatar: 'https://placehold.co/100x100.png',
+      rating: 5,
+      title: 'Absolutely fantastic!',
+      content: 'The sound quality is crisp and clear, and the noise cancellation is a game-changer. They are also incredibly comfortable for long listening sessions. Worth every penny!',
+      date: '2024-05-22',
+    },
+    {
+      id: 'rev2',
+      author: 'Mark Roberts',
+      avatar: 'https://placehold.co/100x100.png',
+      rating: 4,
+      title: 'Great headphones, solid performance',
+      content: "Really happy with this purchase. The battery life is impressive, and they connect to my devices seamlessly. My only small gripe is they feel a bit tight after several hours of use.",
+      date: '2024-05-18',
+    },
+  ],
+  '2': [
+     {
+      id: 'rev3',
+      author: 'David Chen',
+      avatar: 'https://placehold.co/100x100.png',
+      rating: 5,
+      title: 'Perfect fit and quality',
+      content: 'This t-shirt is made from high-quality cotton and fits perfectly. It has held up well after multiple washes. A great staple for any wardrobe.',
+      date: '2024-05-20',
+    }
+  ],
+  '5': [
+     {
+      id: 'rev4',
+      author: 'Emily White',
+      avatar: 'https://placehold.co/100x100.png',
+      rating: 5,
+      title: 'The most comfortable yoga pants ever',
+      content: "These are so soft and stretchy, it feels like I'm wearing nothing. They are not see-through at all, even during deep squats. I'm buying another pair in a different color!",
+      date: '2024-05-25',
+    },
+  ],
+  '7': [
+     {
+      id: 'rev5',
+      author: 'Sophia Brown',
+      avatar: 'https://placehold.co/100x100.png',
+      rating: 5,
+      title: 'Life-changing book',
+      content: "This book provides practical and actionable steps to build better habits. It's well-researched and easy to read. I've already started implementing its principles in my daily life.",
+      date: '2024-05-21',
+    },
+  ]
+};
+
+
 export const products: Product[] = [
   {
     id: '1',
@@ -18,10 +75,11 @@ export const products: Product[] = [
     originalPrice: 129.99,
     badge: 'Sale',
     image: 'https://placehold.co/600x600.png',
-    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x400.png', 'https://placehold.co/400x600.png', 'https://placehold.co/600x600.png'],
     categoryId: 'electronics',
     featured: true,
     rating: 4.5,
+    reviews: productReviews['1'],
   },
   {
     id: '2',
@@ -33,6 +91,7 @@ export const products: Product[] = [
     categoryId: 'apparel',
     featured: true,
     rating: 4.8,
+    reviews: productReviews['2'],
   },
   {
     id: '3',
@@ -46,6 +105,7 @@ export const products: Product[] = [
     categoryId: 'books',
     featured: false,
     rating: 4.6,
+    reviews: productReviews['3'],
   },
   {
     id: '4',
@@ -57,6 +117,7 @@ export const products: Product[] = [
     categoryId: 'electronics',
     featured: false,
     rating: 4.7,
+    reviews: productReviews['4'],
   },
   {
     id: '5',
@@ -69,6 +130,7 @@ export const products: Product[] = [
     categoryId: 'apparel',
     featured: true,
     rating: 4.9,
+    reviews: productReviews['5'],
   },
   {
     id: '6',
@@ -82,6 +144,7 @@ export const products: Product[] = [
     categoryId: 'home-goods',
     featured: false,
     rating: 4.8,
+    reviews: productReviews['6'],
   },
   {
     id: '7',
@@ -93,6 +156,7 @@ export const products: Product[] = [
     categoryId: 'books',
     featured: true,
     rating: 4.9,
+    reviews: productReviews['7'],
   },
   {
     id: '8',
@@ -104,6 +168,7 @@ export const products: Product[] = [
     categoryId: 'home-goods',
     featured: false,
     rating: 4.7,
+    reviews: productReviews['8'],
   },
 ];
 
