@@ -2,51 +2,76 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, ShoppingCart, User, Search, Sun, ChevronDown } from 'lucide-react';
+import { Menu, ShoppingCart, User, Search, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
 
-const navItems = [
-  { href: '/products', label: 'All Products' },
+const apparelComponents: { title: string; href: string; description: string }[] = [
   {
-    label: 'Apparel',
-    subLinks: [
-      { href: '/products?category=apparel', label: 'All Apparel' },
-      { href: '/products?category=apparel&subcategory=tops', label: 'Tops' },
-      { href: '/products?category=apparel&subcategory=bottoms', label: 'Bottoms' },
-      { href: '/products?category=apparel&subcategory=dresses', label: 'Dresses' },
-    ],
+    title: "Shirts",
+    href: "/products?category=apparel&subcategory=shirts",
+    description: "Classic button-downs, casual tees, and stylish blouses.",
   },
+  {
+    title: "Jackets",
+    href: "/products?category=apparel&subcategory=jackets",
+    description: "From timeless denim jackets to tailored blazers.",
+  },
+  {
+    title: "Dresses",
+    href: "/products?category=apparel&subcategory=dresses",
+    description: "Elegant dresses for every occasion, from casual to formal.",
+  },
+  {
+    title: "Pants & Jeans",
+    href: "/products?category=apparel&subcategory=pants-jeans",
+    description: "A wide range of styles from comfortable pants to classic jeans.",
+  },
+]
+const accessoriesComponents: { title: string; href: string; description: string }[] = [
     {
-    label: 'Accessories',
-    subLinks: [
-      { href: '/products?category=accessories', label: 'All Accessories' },
-      { href: '/products?category=accessories&subcategory=bags', label: 'Bags' },
-      { href: '/products?category=accessories&subcategory=belts', label: 'Belts' },
-      { href: '/products?category=accessories&subcategory=jewelry', label: 'Jewelry' },
-    ],
-  },
-  { href: '/products?category=footwear', label: 'Footwear' },
-  { href: '/', label: 'Home' },
-];
+        title: "Bags",
+        href: "/products?category=accessories&subcategory=bags",
+        description: "Explore our collection of stylish and functional bags for every occasion.",
+    },
+    {
+        title: "Belts",
+        href: "/products?category=accessories&subcategory=belts",
+        description: "Find the perfect belt to complete your look, from classic leather to modern designs.",
+    },
+    {
+        title: "Jewelry",
+        href: "/products?category=accessories&subcategory=jewelry",
+        description: "Adorn yourself with our stunning range of jewelry, from delicate necklaces to statement earrings.",
+    },
+    {
+        title: "Hats & Scarves",
+        href: "/products?category=accessories&subcategory=hats-scarves",
+        description: "Stay warm and stylish with our selection of hats and scarves.",
+    },
+]
 
 export function Header() {
   const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
         {/* Mobile Header */}
         <div className="flex w-full items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center space-x-2">
@@ -66,42 +91,62 @@ export function Header() {
                     
                     <div className="flex-grow">
                       <Accordion type="multiple" className="w-full flex flex-col">
-                        {navItems.map((item, index) => (
-                          item.subLinks ? (
-                            <AccordionItem value={`item-${index}`} key={index}>
-                              <AccordionTrigger className="text-lg text-muted-foreground hover:text-foreground hover:no-underline">{item.label}</AccordionTrigger>
-                              <AccordionContent>
+                        <AccordionItem value="apparel">
+                            <AccordionTrigger className="text-lg text-muted-foreground hover:text-foreground hover:no-underline">Apparel</AccordionTrigger>
+                            <AccordionContent>
                                 <div className="flex flex-col space-y-3 pl-4">
-                                  {item.subLinks.map(subLink => (
-                                    <SheetClose asChild key={subLink.href}>
-                                      <Link
-                                        href={subLink.href}
-                                        className={cn(
-                                          'text-base text-muted-foreground transition-colors hover:text-foreground',
-                                          pathname === subLink.href && 'text-foreground font-semibold'
-                                        )}
-                                      >
-                                        {subLink.label}
-                                      </Link>
+                                    <SheetClose asChild>
+                                        <Link href="/products?category=apparel" className="text-base text-muted-foreground transition-colors hover:text-foreground">All Apparel</Link>
                                     </SheetClose>
-                                  ))}
+                                    {apparelComponents.map(subLink => (
+                                        <SheetClose asChild key={subLink.href}>
+                                        <Link
+                                            href={subLink.href}
+                                            className={cn(
+                                            'text-base text-muted-foreground transition-colors hover:text-foreground',
+                                            pathname === subLink.href && 'text-foreground font-semibold'
+                                            )}
+                                        >
+                                            {subLink.title}
+                                        </Link>
+                                        </SheetClose>
+                                    ))}
                                 </div>
-                              </AccordionContent>
-                            </AccordionItem>
-                          ) : (
-                            <SheetClose asChild key={item.href}>
-                                <Link
-                                    href={item.href!}
-                                    className={cn(
-                                        'block text-lg text-muted-foreground transition-colors hover:text-foreground py-4 border-b',
-                                        pathname === item.href && 'text-foreground font-semibold'
-                                    )}
-                                >
-                                    {item.label}
-                                </Link>
-                            </SheetClose>
-                          )
-                        ))}
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="accessories">
+                            <AccordionTrigger className="text-lg text-muted-foreground hover:text-foreground hover:no-underline">Accessories</AccordionTrigger>
+                            <AccordionContent>
+                                <div className="flex flex-col space-y-3 pl-4">
+                                    <SheetClose asChild>
+                                        <Link href="/products?category=accessories" className="text-base text-muted-foreground transition-colors hover:text-foreground">All Accessories</Link>
+                                    </SheetClose>
+                                    {accessoriesComponents.map(subLink => (
+                                        <SheetClose asChild key={subLink.href}>
+                                        <Link
+                                            href={subLink.href}
+                                            className={cn(
+                                            'text-base text-muted-foreground transition-colors hover:text-foreground',
+                                            pathname === subLink.href && 'text-foreground font-semibold'
+                                            )}
+                                        >
+                                            {subLink.title}
+                                        </Link>
+                                        </SheetClose>
+                                    ))}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <SheetClose asChild>
+                            <Link href="/products?category=footwear" className="block text-lg text-muted-foreground transition-colors hover:text-foreground py-4 border-b">
+                                Footwear
+                            </Link>
+                        </SheetClose>
+                        <SheetClose asChild>
+                            <Link href="/" className="block text-lg text-muted-foreground transition-colors hover:text-foreground py-4 border-b">
+                                Home
+                            </Link>
+                        </SheetClose>
                       </Accordion>
                     </div>
                     
@@ -123,44 +168,91 @@ export function Header() {
         {/* Desktop Header */}
         <div className="hidden w-full items-center justify-between lg:flex">
             <div className="flex items-center gap-6">
-                <Link href="/" className="mr-4">
+                <Link href="/" className="mr-4 flex items-center gap-2">
                     <span className="font-extrabold text-2xl tracking-tight">eShop</span>
                 </Link>
-                <nav className="flex items-center space-x-6 text-sm font-medium">
-                  {navItems.map((item, index) => (
-                    item.subLinks ? (
-                      <DropdownMenu key={index}>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className={cn(
-                            "flex items-center gap-1 text-sm font-medium transition-colors hover:text-foreground/80 hover:bg-transparent px-0",
-                            item.subLinks.some(sl => pathname.startsWith(sl.href)) ? 'text-foreground' : 'text-foreground/60'
-                          )}>
-                            {item.label}
-                            <ChevronDown className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          {item.subLinks.map(subLink => (
-                            <DropdownMenuItem key={subLink.href} asChild>
-                              <Link href={subLink.href}>{subLink.label}</Link>
-                            </DropdownMenuItem>
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Apparel</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                          <li className="row-span-3">
+                            <NavigationMenuLink asChild>
+                              <a
+                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                href="/products?category=apparel"
+                              >
+                                <Image src="https://placehold.co/400x500.png" width={400} height={500} alt="Apparel Collection" className="mb-4 h-48 w-full object-cover rounded-md" data-ai-hint="fashion apparel" />
+                                <div className="mb-2 mt-4 text-lg font-medium">
+                                  Apparel Collection
+                                </div>
+                                <p className="text-sm leading-tight text-muted-foreground">
+                                  Stylish and comfortable clothing for every occasion.
+                                </p>
+                              </a>
+                            </NavigationMenuLink>
+                          </li>
+                          {apparelComponents.slice(0,3).map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                            >
+                              {component.description}
+                            </ListItem>
                           ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    ) : (
-                      <Link
-                        key={item.href}
-                        href={item.href!}
-                        className={cn(
-                          'transition-colors hover:text-foreground/80',
-                          pathname === item.href ? 'text-foreground' : 'text-foreground/60'
-                        )}
-                      >
-                        {item.label}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Accessories</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                       <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                          <li className="row-span-3">
+                            <NavigationMenuLink asChild>
+                              <a
+                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                href="/products?category=accessories"
+                              >
+                                <Image src="https://placehold.co/400x500.png" width={400} height={500} alt="Accessories Collection" className="mb-4 h-48 w-full object-cover rounded-md" data-ai-hint="fashion accessories" />
+                                <div className="mb-2 mt-4 text-lg font-medium">
+                                  Complete Your Look
+                                </div>
+                                <p className="text-sm leading-tight text-muted-foreground">
+                                   Find the perfect finishing touches with our curated accessories.
+                                </p>
+                              </a>
+                            </NavigationMenuLink>
+                          </li>
+                          {accessoriesComponents.slice(0,3).map((component) => (
+                            <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                            >
+                              {component.description}
+                            </ListItem>
+                          ))}
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <Link href="/products?category=footwear" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                          Footwear
+                        </NavigationMenuLink>
                       </Link>
-                    )
-                  ))}
-                </nav>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <Link href="/" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                          Home
+                        </NavigationMenuLink>
+                      </Link>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
             </div>
 
             <div className="flex items-center gap-4">
@@ -194,3 +286,29 @@ export function Header() {
     </header>
   );
 }
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = "ListItem"
