@@ -179,7 +179,7 @@ export function Header() {
                         <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                           <li className="row-span-3">
                             <NavigationMenuLink asChild>
-                              <a
+                              <Link
                                 className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                 href="/products?category=apparel"
                               >
@@ -190,7 +190,7 @@ export function Header() {
                                 <p className="text-sm leading-tight text-muted-foreground">
                                   Stylish and comfortable clothing for every occasion.
                                 </p>
-                              </a>
+                              </Link>
                             </NavigationMenuLink>
                           </li>
                           {apparelComponents.slice(0,3).map((component) => (
@@ -211,7 +211,7 @@ export function Header() {
                        <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                           <li className="row-span-3">
                             <NavigationMenuLink asChild>
-                              <a
+                              <Link
                                 className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                 href="/products?category=accessories"
                               >
@@ -222,7 +222,7 @@ export function Header() {
                                 <p className="text-sm leading-tight text-muted-foreground">
                                    Find the perfect finishing touches with our curated accessories.
                                 </p>
-                              </a>
+                              </Link>
                             </NavigationMenuLink>
                           </li>
                           {accessoriesComponents.slice(0,3).map((component) => (
@@ -238,18 +238,18 @@ export function Header() {
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <Link href="/products?category=footwear" legacyBehavior passHref>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      <NavigationMenuLink asChild>
+                        <Link href="/products?category=footwear" className={navigationMenuTriggerStyle()}>
                           Footwear
-                        </NavigationMenuLink>
-                      </Link>
+                        </Link>
+                      </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <Link href="/" legacyBehavior passHref>
-                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      <NavigationMenuLink asChild>
+                        <Link href="/" className={navigationMenuTriggerStyle()}>
                           Home
-                        </NavigationMenuLink>
-                      </Link>
+                        </Link>
+                      </NavigationMenuLink>
                     </NavigationMenuItem>
                   </NavigationMenuList>
                 </NavigationMenu>
@@ -289,12 +289,12 @@ export function Header() {
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
+  React.ComponentPropsWithoutRef<typeof Link>
 >(({ className, title, children, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
+        <Link
           ref={ref}
           className={cn(
             "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
@@ -306,7 +306,7 @@ const ListItem = React.forwardRef<
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
-        </a>
+        </Link>
       </NavigationMenuLink>
     </li>
   )
