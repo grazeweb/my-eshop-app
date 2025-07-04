@@ -134,13 +134,15 @@ export default function Home() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {teamMembers.map((member, index) => (
-            <Card key={index} className="p-6">
-              <CardContent className="p-0">
-                <Quote className="h-8 w-8 text-muted-foreground mb-4" />
-                <p className="text-lg text-muted-foreground mb-6">
-                  "{member.quote}"
-                </p>
-                <div className="flex items-center gap-4">
+            <Card key={index} className="flex flex-col">
+              <CardContent className="p-8 flex flex-col flex-grow">
+                <div className="flex-grow">
+                  <Quote className="h-16 w-16 text-gray-200 dark:text-gray-700 mb-4" />
+                  <p className="text-lg text-muted-foreground mb-6">
+                    "{member.quote}"
+                  </p>
+                </div>
+                <div className="flex items-center gap-4 mt-auto">
                   <Avatar>
                     {member.avatarImage ? (
                       <AvatarImage
