@@ -1,11 +1,15 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export interface Review {
-  id: string;
-  author: string;
-  avatar?: string;
+  id: string; // Firestore document ID
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string | null;
+  productId: string;
   rating: number;
   title: string;
   content: string;
-  date: string;
+  createdAt: Timestamp;
 }
 
 export interface Product {
@@ -20,7 +24,6 @@ export interface Product {
   categoryId: string;
   featured: boolean;
   rating: number;
-  reviews?: Review[];
 }
 
 export interface Category {

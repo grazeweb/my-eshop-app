@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { products } from '@/lib/data';
@@ -12,6 +12,8 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ProductReviews } from '@/components/product-reviews';
+import type { Review } from '@/lib/types';
+import { getReviewsForProduct } from '@/lib/reviews';
 
 export default function ProductPage({ params }: { params: { id:string } }) {
   const product = products.find((p) => p.id === params.id);
@@ -19,6 +21,25 @@ export default function ProductPage({ params }: { params: { id:string } }) {
   const [selectedImage, setSelectedImage] = useState(product?.images[0] ?? product?.image ?? '');
   const [quantity, setQuantity] = useState(1);
   const [isWished, setIsWished] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  const fetchReviews = useCallback(async () => {
+    if (!product) return;
+    setReviewsLoading(true);
+    try {
+        const fetchedReviews = await getReviewsForProduct(product.id);
+        setReviews(fetchedReviews);
+    } catch (error) {
+        console.error("Failed to fetch reviews", error);
+    } finally {
+        setReviewsLoading(false);
+    }
+  }, [product]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
   if (!product) {
     notFound();
@@ -28,13 +49,16 @@ export default function ProductPage({ params }: { params: { id:string } }) {
     .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
     .slice(0, 4);
 
-  const productReviews = product.reviews ?? [];
-  const totalReviews = productReviews.length;
-  const averageRating = useMemo(() => {
-    if (totalReviews === 0) return product.rating;
-    const total = productReviews.reduce((acc, review) => acc + review.rating, 0);
-    return total / totalReviews;
-  }, [productReviews, totalReviews, product.rating]);
+  const { averageRating, totalReviews } = useMemo(() => {
+    if (reviews.length === 0) {
+        return { averageRating: product.rating, totalReviews: 0 };
+    }
+    const total = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return {
+        averageRating: total / reviews.length,
+        totalReviews: reviews.length,
+    };
+  }, [reviews, product.rating]);
 
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => {
@@ -124,7 +148,14 @@ export default function ProductPage({ params }: { params: { id:string } }) {
       </div>
 
       <div id="reviews">
-        <ProductReviews reviews={productReviews} averageRating={averageRating} totalReviews={totalReviews} />
+        <ProductReviews
+          productId={product.id}
+          reviews={reviews} 
+          averageRating={averageRating} 
+          totalReviews={totalReviews} 
+          reviewsLoading={reviewsLoading}
+          onReviewSubmitted={fetchReviews}
+        />
       </div>
 
       {relatedProducts.length > 0 && (
