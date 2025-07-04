@@ -5,18 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarTrigger,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import {
   LayoutGrid,
   Package,
   Heart,
@@ -29,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -51,60 +40,46 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   if (loading || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-16 w-16 animate-spin" />
       </div>
     );
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen bg-muted/40">
-        <Sidebar>
-          <SidebarHeader>
-             <div className="flex items-center gap-2 p-2">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link href="/"><BrainCircuit className="text-primary h-8 w-8" /></Link>
-                </Button>
-             </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href))}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{item.label}</span>
+    <div className="container mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-[250px_1fr] gap-12">
+            <aside className="flex flex-col justify-between">
+                <nav className="flex flex-col gap-2">
+                    {menuItems.map((item) => (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                            (pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href))) && "bg-muted text-primary"
+                        )}
+                    >
+                        <item.icon className="h-4 w-4" />
+                        {item.label}
                     </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={logout}>
-                  <LogOut />
-                  <span>Logout</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-        </Sidebar>
-        <SidebarInset className="max-w-7xl mx-auto w-full">
-            <div className="p-4 sm:p-6 lg:p-8">
-                <div className="md:hidden mb-4">
-                  <SidebarTrigger />
+                    ))}
+                     <button
+                        onClick={logout}
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                    >
+                        <LogOut className="h-4 w-4" />
+                        Logout
+                    </button>
+                </nav>
+                 <div className="flex items-center justify-center mt-8">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="/"><BrainCircuit className="text-primary h-8 w-8" /></Link>
+                    </Button>
                 </div>
-                {children}
-            </div>
-        </SidebarInset>
-      </div>
-    </SidebarProvider>
+            </aside>
+            <main>{children}</main>
+        </div>
+    </div>
   );
 }

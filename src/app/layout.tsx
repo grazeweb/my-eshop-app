@@ -13,9 +13,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isAccountOrAdminPage = pathname.startsWith('/account') || pathname.startsWith('/admin');
-
   return (
     <html lang="en">
       <head>
@@ -30,15 +27,11 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
-          {isAccountOrAdminPage ? (
-            <main>{children}</main>
-          ) : (
             <div className="flex flex-col min-h-screen">
               <Header />
               <main className="flex-grow">{children}</main>
               <Footer />
             </div>
-          )}
           <Toaster />
         </AuthProvider>
       </body>
