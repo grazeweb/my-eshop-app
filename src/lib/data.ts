@@ -1,0 +1,128 @@
+import type { Product, Category, Order } from './types';
+
+export const categories: Category[] = [
+  { id: 'electronics', name: 'Electronics' },
+  { id: 'clothing', name: 'Clothing' },
+  { id: 'books', name: 'Books' },
+  { id: 'home-goods', name: 'Home Goods' },
+];
+
+export const products: Product[] = [
+  {
+    id: '1',
+    name: 'Wireless Bluetooth Headphones',
+    description: 'High-fidelity wireless headphones with noise-cancellation and a 20-hour battery life. Perfect for music lovers and commuters.',
+    price: 99.99,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    categoryId: 'electronics',
+    featured: true,
+    rating: 4.5,
+  },
+  {
+    id: '2',
+    name: 'Men\'s Classic T-Shirt',
+    description: 'A comfortable and stylish 100% cotton t-shirt. Available in various colors and sizes. A wardrobe essential.',
+    price: 19.99,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    categoryId: 'clothing',
+    featured: true,
+    rating: 4.8,
+  },
+  {
+    id: '3',
+    name: 'The Midnight Library',
+    description: 'A novel by Matt Haig, exploring the choices that go into a life well lived. A Sunday Times bestseller.',
+    price: 14.50,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png'],
+    categoryId: 'books',
+    featured: false,
+    rating: 4.6,
+  },
+  {
+    id: '4',
+    name: 'Smart Home Hub',
+    description: 'Control all your smart devices from one central hub. Compatible with Alexa, Google Assistant, and Apple HomeKit.',
+    price: 129.00,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    categoryId: 'electronics',
+    featured: false,
+    rating: 4.7,
+  },
+  {
+    id: '5',
+    name: 'Women\'s Yoga Pants',
+    description: 'High-waisted, buttery soft yoga pants perfect for workouts or lounging. Breathable and moisture-wicking fabric.',
+    price: 49.99,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    categoryId: 'clothing',
+    featured: true,
+    rating: 4.9,
+  },
+  {
+    id: '6',
+    name: 'Scented Soy Candle',
+    description: 'Hand-poured soy wax candle with a calming lavender scent. 40-hour burn time. Perfect for creating a relaxing atmosphere.',
+    price: 24.99,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png'],
+    categoryId: 'home-goods',
+    featured: false,
+    rating: 4.8,
+  },
+  {
+    id: '7',
+    name: 'Atomic Habits',
+    description: 'An easy & proven way to build good habits & break bad ones by James Clear. A #1 New York Times bestseller.',
+    price: 16.99,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png'],
+    categoryId: 'books',
+    featured: true,
+    rating: 4.9,
+  },
+  {
+    id: '8',
+    name: 'Kitchen Stand Mixer',
+    description: 'Powerful 10-speed stand mixer for all your baking needs. Includes a 5-quart stainless steel bowl, flat beater, dough hook, and wire whip.',
+    price: 249.99,
+    image: 'https://placehold.co/600x600.png',
+    images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
+    categoryId: 'home-goods',
+    featured: false,
+    rating: 4.7,
+  },
+];
+
+export const featuredProducts = products.filter(p => p.featured);
+
+export const orders: Order[] = [
+    {
+      id: 'ORD001',
+      date: '2023-10-26',
+      status: 'Delivered',
+      total: 119.98,
+      items: [
+        { product: products[0], quantity: 1 },
+        { product: products[1], quantity: 1 },
+      ],
+    },
+    {
+      id: 'ORD002',
+      date: '2023-10-28',
+      status: 'Shipped',
+      total: 49.99,
+      items: [{ product: products[4], quantity: 1 }],
+    },
+    {
+      id: 'ORD003',
+      date: '2023-11-01',
+      status: 'Processing',
+      total: 16.99,
+      items: [{ product: products[6], quantity: 1 }],
+    },
+  ];
