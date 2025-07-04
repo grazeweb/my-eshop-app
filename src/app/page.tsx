@@ -92,8 +92,8 @@ export default function Home() {
         <Image
           src="https://placehold.co/1600x900.png"
           alt="Promotional background"
-          layout="fill"
-          objectFit="cover"
+          fill
+          style={{ objectFit: 'cover' }}
           className="absolute inset-0 z-0 opacity-40"
           data-ai-hint="fashion clothes"
         />

@@ -63,7 +63,7 @@ export default function CartPage() {
                           <Button variant="outline" size="icon" className="h-8 w-8"><Plus className="h-4 w-4"/></Button>
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">${(item.price ?? 0 * item.quantity).toFixed(2)}</TableCell>
+                      <TableCell className="text-right">${((item.price ?? 0) * item.quantity).toFixed(2)}</TableCell>
                     </TableRow>
                     )
                   ))}
