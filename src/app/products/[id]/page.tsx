@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -11,13 +12,6 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ProductReviews } from '@/components/product-reviews';
-
-// This function is still needed for Next.js to know which product pages to generate at build time.
-export function generateStaticParams() {
-  return products.map((product) => ({
-    id: product.id,
-  }));
-}
 
 export default function ProductPage({ params }: { params: { id:string } }) {
   const product = products.find((p) => p.id === params.id);
