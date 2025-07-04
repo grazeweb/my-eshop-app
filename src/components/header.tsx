@@ -20,12 +20,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex">
+        {/* Left Part: Logo */}
+        <div className="mr-auto flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <Package className="h-6 w-6" />
             <span className="font-bold">ShopEase</span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
+        </div>
+
+        {/* Right Part: Desktop Nav, Icons, and Mobile Menu */}
+        <div className="flex items-center space-x-2">
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium mr-4">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -39,40 +44,7 @@ export function Header() {
               </Link>
             ))}
           </nav>
-        </div>
-
-        {/* Mobile Nav */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Toggle Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <Link href="/" className="flex items-center space-x-2 mb-6">
-              <Package className="h-6 w-6" />
-              <span className="font-bold">ShopEase</span>
-            </Link>
-            <div className="flex flex-col space-y-3">
-              {navLinks.map((link) => (
-                <SheetClose asChild key={link.href}>
-                  <Link
-                    href={link.href}
-                    className={cn(
-                      'text-muted-foreground transition-colors hover:text-foreground',
-                      pathname === link.href && 'text-foreground'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                </SheetClose>
-              ))}
-            </div>
-          </SheetContent>
-        </Sheet>
-        
-        <div className="flex flex-1 items-center justify-end space-x-2">
+          
           <Button variant="ghost" size="icon" asChild>
             <Link href="/cart">
               <ShoppingCart className="h-5 w-5" />
@@ -85,6 +57,51 @@ export function Header() {
               <span className="sr-only">User Account</span>
             </Link>
           </Button>
+          
+          {/* Mobile Nav */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right">
+              <Link href="/" className="flex items-center space-x-2 mb-6">
+                <Package className="h-6 w-6" />
+                <span className="font-bold">ShopEase</span>
+              </Link>
+              <div className="flex flex-col space-y-3">
+                {navLinks.map((link) => (
+                  <SheetClose asChild key={link.href}>
+                    <Link
+                      href={link.href}
+                      className={cn(
+                        'text-lg text-muted-foreground transition-colors hover:text-foreground',
+                        pathname === link.href && 'text-foreground font-semibold'
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  </SheetClose>
+                ))}
+                <div className="border-t pt-4 mt-4 space-y-3">
+                  <SheetClose asChild>
+                      <Link href="/cart" className="flex items-center gap-3 text-lg text-muted-foreground transition-colors hover:text-foreground">
+                          <ShoppingCart className="h-5 w-5" />
+                          <span>Cart</span>
+                      </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                      <Link href="/account" className="flex items-center gap-3 text-lg text-muted-foreground transition-colors hover:text-foreground">
+                          <User className="h-5 w-5" />
+                          <span>Account</span>
+                      </Link>
+                  </SheetClose>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
