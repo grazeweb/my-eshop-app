@@ -22,10 +22,10 @@ const navItems = [
   {
     label: 'Apparel',
     subLinks: [
-      { href: '/products?category=clothing', label: 'All Apparel' },
-      { href: '/products?category=clothing&subcategory=tops', label: 'Tops' },
-      { href: '/products?category=clothing&subcategory=bottoms', label: 'Bottoms' },
-      { href: '/products?category=clothing&subcategory=dresses', label: 'Dresses' },
+      { href: '/products?category=apparel', label: 'All Apparel' },
+      { href: '/products?category=apparel&subcategory=tops', label: 'Tops' },
+      { href: '/products?category=apparel&subcategory=bottoms', label: 'Bottoms' },
+      { href: '/products?category=apparel&subcategory=dresses', label: 'Dresses' },
     ],
   },
     {
@@ -46,7 +46,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center px-8">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
         {/* Mobile Header */}
         <div className="flex w-full items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center space-x-2">

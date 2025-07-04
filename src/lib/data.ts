@@ -2,9 +2,11 @@ import type { Product, Category, Order } from './types';
 
 export const categories: Category[] = [
   { id: 'electronics', name: 'Electronics' },
-  { id: 'clothing', name: 'Clothing' },
+  { id: 'apparel', name: 'Apparel' },
   { id: 'books', name: 'Books' },
   { id: 'home-goods', name: 'Home Goods' },
+  { id: 'accessories', name: 'Accessories' },
+  { id: 'footwear', name: 'Footwear' },
 ];
 
 export const products: Product[] = [
@@ -28,7 +30,7 @@ export const products: Product[] = [
     price: 19.99,
     image: 'https://placehold.co/600x600.png',
     images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
-    categoryId: 'clothing',
+    categoryId: 'apparel',
     featured: true,
     rating: 4.8,
   },
@@ -64,7 +66,7 @@ export const products: Product[] = [
     badge: 'New',
     image: 'https://placehold.co/600x600.png',
     images: ['https://placehold.co/600x600.png', 'https://placehold.co/600x600.png'],
-    categoryId: 'clothing',
+    categoryId: 'apparel',
     featured: true,
     rating: 4.9,
   },
