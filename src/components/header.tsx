@@ -70,7 +70,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
         {/* Mobile Header */}
         <div className="flex w-full items-center justify-between lg:hidden">
@@ -166,8 +166,8 @@ export function Header() {
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden w-full items-center justify-between lg:flex">
-            <div className="flex items-center gap-6">
+        <div className="hidden lg:flex w-full items-center">
+             <div className="flex items-center gap-6">
                 <Link href="/" className="mr-4 flex items-center gap-2">
                     <span className="font-extrabold text-2xl tracking-tight">eShop</span>
                 </Link>
@@ -254,16 +254,7 @@ export function Header() {
                   </NavigationMenuList>
                 </NavigationMenu>
             </div>
-
-            <div className="flex items-center gap-4">
-                <div className="relative w-full max-w-xs">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                        type="search"
-                        placeholder="Search..."
-                        className="w-full rounded-md bg-muted pl-10"
-                    />
-                </div>
+            <div className="ml-auto flex items-center gap-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/cart">
                       <ShoppingCart className="h-5 w-5" />
