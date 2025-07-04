@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import {
@@ -131,12 +132,12 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center font-headline mb-12">
           Meet Our Team
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {teamMembers.map((member, index) => (
             <Card key={index} className="p-6">
               <CardContent className="p-0">
                 <Quote className="h-8 w-8 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-6 text-sm">
+                <p className="text-muted-foreground mb-6">
                   "{member.quote}"
                 </p>
                 <div className="flex items-center gap-4">
