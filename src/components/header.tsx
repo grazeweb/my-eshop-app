@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, ShoppingCart, User, Search, Sun } from 'lucide-react';
+import { Menu, ShoppingCart, User, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -71,7 +71,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-8">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Mobile Header */}
         <div className="flex w-full items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center space-x-2">
@@ -152,7 +152,6 @@ export function Header() {
                     
                     <div className="border-t pt-4 mt-4 space-y-4">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                             <Input type="search" placeholder="Search..." className="w-full bg-muted pl-10" />
                         </div>
                         <div className="flex items-center justify-around">
