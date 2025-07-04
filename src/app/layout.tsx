@@ -1,24 +1,26 @@
 
-import type { Metadata } from 'next';
+"use client";
+
 import './globals.css';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/auth-context';
-
-export const metadata: Metadata = {
-  title: 'eShop - Your one-stop shop',
-  description: 'A modern e-commerce platform built with Next.js.',
-};
+import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isAccountOrAdminPage = pathname.startsWith('/account') || pathname.startsWith('/admin');
+
   return (
     <html lang="en">
       <head>
+        <title>eShop - Your one-stop shop</title>
+        <meta name="description" content="A modern e-commerce platform built with Next.js." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -26,11 +28,17 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="font-body antialiased flex flex-col min-h-screen">
+      <body className="font-body antialiased">
         <AuthProvider>
-          <Header />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          {isAccountOrAdminPage ? (
+            <main>{children}</main>
+          ) : (
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              <main className="flex-grow">{children}</main>
+              <Footer />
+            </div>
+          )}
           <Toaster />
         </AuthProvider>
       </body>
