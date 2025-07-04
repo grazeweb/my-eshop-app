@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -19,6 +20,10 @@ export default function ProductsPage() {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
       setSelectedCategories([categoryParam]);
+    }
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      setSearchTerm(searchParam);
     }
   }, [searchParams]);
 

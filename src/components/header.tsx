@@ -3,12 +3,12 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { Menu, ShoppingCart, User, Sun } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, ShoppingCart, User, Sun, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
@@ -68,10 +68,19 @@ const accessoriesComponents: { title: string; href: string; description: string 
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 items-center px-4">
         {/* Mobile Header */}
         <div className="flex w-full items-center justify-between lg:hidden">
             <Link href="/" className="flex items-center space-x-2">
@@ -151,9 +160,16 @@ export function Header() {
                     </div>
                     
                     <div className="border-t pt-4 mt-4 space-y-4">
-                        <div className="relative">
-                            <Input type="search" placeholder="Search..." className="w-full bg-muted pl-10" />
-                        </div>
+                        <form onSubmit={handleSearch} className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                placeholder="Search..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-muted pl-10"
+                            />
+                        </form>
                         <div className="flex items-center justify-around">
                             <Button variant="ghost" size="icon" asChild><Link href="/cart"><ShoppingCart className="h-5 w-5" /><span className="sr-only">Cart</span></Link></Button>
                             <Button variant="ghost" size="icon"><Sun className="h-5 w-5" /><span className="sr-only">Toggle Theme</span></Button>
@@ -165,7 +181,7 @@ export function Header() {
         </div>
 
         {/* Desktop Header */}
-        <div className="hidden lg:flex w-full items-center">
+        <div className="hidden lg:flex w-full items-center justify-between">
              <div className="flex items-center gap-6">
                 <Link href="/" className="mr-4 flex items-center gap-2">
                     <span className="font-extrabold text-2xl tracking-tight">eShop</span>
@@ -237,23 +253,33 @@ export function Header() {
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <NavigationMenuLink asChild>
-                        <Link href="/products?category=footwear" className={navigationMenuTriggerStyle()}>
+                      <Link href="/products?category=footwear" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                           Footwear
-                        </Link>
-                      </NavigationMenuLink>
+                        </NavigationMenuLink>
+                      </Link>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                      <NavigationMenuLink asChild>
-                        <Link href="/" className={navigationMenuTriggerStyle()}>
+                      <Link href="/" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                           Home
-                        </Link>
-                      </NavigationMenuLink>
+                        </NavigationMenuLink>
+                      </Link>
                     </NavigationMenuItem>
                   </NavigationMenuList>
                 </NavigationMenu>
             </div>
-            <div className="ml-auto flex items-center gap-4">
+            <div className="flex items-center gap-2">
+                <form onSubmit={handleSearch} className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="search"
+                        placeholder="Search..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="h-9 w-48 pl-9"
+                    />
+                </form>
                 <Button variant="ghost" size="icon" asChild>
                     <Link href="/cart">
                       <ShoppingCart className="h-5 w-5" />
