@@ -18,6 +18,71 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
+
+const apparelComponents: { title: string; href: string; description: string }[] = [
+  {
+    title: 'Shirts',
+    href: '/products?category=apparel&subcategory=shirts',
+    description: 'Classic button-downs, casual tees, and stylish blouses.',
+  },
+  {
+    title: 'Jackets',
+    href: '/products?category=apparel&subcategory=jackets',
+    description: 'From timeless denim jackets to tailored blazers.',
+  },
+  {
+    title: 'Dresses',
+    href: '/products?category=apparel&subcategory=dresses',
+    description: 'Elegant dresses for every occasion, from casual to formal.',
+  },
+  {
+    title: 'Pants & Jeans',
+    href: '/products?category=apparel&subcategory=pants',
+    description: 'A wide range of styles from comfortable pants to... ',
+  },
+];
+
+const accessoriesComponents: { title: string; href: string; description: string }[] = [
+  {
+    title: 'Watches',
+    href: '/products?category=accessories&subcategory=watches',
+    description: 'Elegant timepieces to complement your style.',
+  },
+  {
+    title: 'Bags',
+    href: '/products?category=accessories&subcategory=bags',
+    description: 'From backpacks to handbags, find the perfect carryall.',
+  },
+  {
+    title: 'Belts',
+    href: '/products?category=accessories&subcategory=belts',
+    description: 'Add the finishing touch to your outfit with a stylish belt.',
+  },
+  {
+    title: 'Sunglasses',
+    href: '/products?category=accessories&subcategory=sunglasses',
+    description: 'Protect your eyes and look cool with our latest collection.',
+  },
+];
+
+const mobileNavLinks = [
+    { href: '/products', label: 'All Products' },
+    { href: '/products?category=apparel', label: 'Apparel' },
+    { href: '/products?category=accessories', label: 'Accessories' },
+    { href: '/products?category=footwear', label: 'Footwear' },
+    { href: '/', label: 'Home' },
+];
 
 export function Header() {
   const pathname = usePathname();
@@ -41,14 +106,6 @@ export function Header() {
     return name.substring(0, 2).toUpperCase();
   }
 
-  const navLinks = [
-    { href: '/products', label: 'All Products' },
-    { href: '/products?category=apparel', label: 'Apparel' },
-    { href: '/products?category=accessories', label: 'Accessories' },
-    { href: '/products?category=footwear', label: 'Footwear' },
-    { href: '/', label: 'Home' },
-  ];
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -56,12 +113,82 @@ export function Header() {
           <Link href="/" className="mr-4 flex items-center gap-2">
             <span className="font-bold text-lg">eShop</span>
           </Link>
-          <nav className="hidden lg:flex items-center gap-6">
-            {navLinks.map(link => (
-              <Link key={link.label} href={link.href} className="text-base font-medium text-foreground/80 transition-colors hover:text-foreground">
-                {link.label}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center gap-1">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link href="/products" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      All Products
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Apparel</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                      <li className="row-span-4">
+                        <NavigationMenuLink asChild>
+                           <Link
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                            href="/products?category=apparel"
+                          >
+                            <div className="relative h-[250px] w-full">
+                                <Image src="https://placehold.co/400x500.png" alt="Apparel Collection" fill style={{objectFit: 'contain'}} className="mb-4 rounded-md" data-ai-hint="fashion apparel" />
+                            </div>
+                            <div className="mb-2 mt-4 text-lg font-medium">
+                              Apparel Collection
+                            </div>
+                            <p className="text-sm leading-tight text-muted-foreground">
+                              Stylish and comfortable clothing for every occasion.
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      {apparelComponents.map((component) => (
+                          <ListItem
+                              key={component.title}
+                              title={component.title}
+                              href={component.href}
+                          >
+                              {component.description}
+                          </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                 <NavigationMenuItem>
+                  <NavigationMenuTrigger>Accessories</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                      {accessoriesComponents.map((component) => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          href={component.href}
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/products?category=footwear" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Footwear
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                      Home
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </nav>
         </div>
         
@@ -81,7 +208,7 @@ export function Header() {
                         </Link>
                     </SheetClose>
                     <nav className="flex flex-col gap-4">
-                        {navLinks.map(link => (
+                        {mobileNavLinks.map(link => (
                             <SheetClose asChild key={link.label}>
                                 <Link href={link.href ?? '#'} className="text-lg text-foreground/80 transition-colors hover:text-foreground">
                                     {link.label}
@@ -163,3 +290,30 @@ export function Header() {
     </header>
   );
 }
+
+
+const ListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  )
+})
+ListItem.displayName = 'ListItem'
