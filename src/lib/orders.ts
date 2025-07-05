@@ -86,6 +86,32 @@ export async function getProductsBoughtCountForUser(userId: string): Promise<num
     return orders.reduce((acc, order) => acc + order.items.reduce((itemAcc, item) => itemAcc + item.quantity, 0), 0);
 }
 
+// Listen for all orders for a specific user
+export function listenForUserOrders(
+  userId: string,
+  callback: (orders: Order[]) => void,
+  onError: (error: Error) => void
+): Unsubscribe {
+  const ordersCol = collection(db, 'orders');
+  const q = query(ordersCol, where('userId', '==', userId), orderBy('createdAt', 'desc'));
+
+  const unsubscribe = onSnapshot(q, 
+    (querySnapshot) => {
+      const orders = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Order));
+      callback(orders);
+    },
+    (error) => {
+      console.error("Error listening for user orders:", error);
+      onError(error);
+    }
+  );
+
+  return unsubscribe;
+}
+
 // Listen for all orders (for admin)
 export function listenForAllOrders(
   callback: (orders: Order[]) => void,

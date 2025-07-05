@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { Eye, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
-import { getOrdersForUser } from '@/lib/orders';
+import { listenForUserOrders } from '@/lib/orders';
 import type { Order } from '@/lib/types';
 import { format } from 'date-fns';
 
@@ -26,9 +26,18 @@ export default function OrderHistoryPage() {
 
     useEffect(() => {
         if (user) {
-            getOrdersForUser(user.uid)
-                .then(setOrders)
-                .finally(() => setLoading(false));
+            const unsubscribe = listenForUserOrders(
+                user.uid,
+                (fetchedOrders) => {
+                    setOrders(fetchedOrders);
+                    setLoading(false);
+                },
+                (error) => {
+                    console.error("Failed to fetch orders:", error);
+                    setLoading(false);
+                }
+            );
+            return () => unsubscribe();
         } else {
             setLoading(false);
         }
