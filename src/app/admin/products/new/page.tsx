@@ -3,33 +3,32 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ProductForm } from '../product-form';
-import { addProduct } from '@/lib/products';
+import { ProductForm, type ProductFormValues } from '../product-form';
+import { addProduct, uploadProductImage } from '@/lib/products';
 import { categories } from '@/lib/data'; 
 import { useToast } from '@/hooks/use-toast';
-
-type ProductFormData = {
-  name: string;
-  description: string;
-  price: number;
-  categoryId: string;
-  image: string;
-};
-
 
 export default function NewProductPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (data: ProductFormData) => {
+  const handleSubmit = async (data: ProductFormValues) => {
     setIsSubmitting(true);
     try {
+      const imageFile = data.image[0];
+      const imageUrl = await uploadProductImage(imageFile);
+
       const newProductData = {
-          ...data,
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          shippingFee: data.shippingFee,
+          categoryId: data.categoryId,
+          image: imageUrl,
           originalPrice: 0,
           badge: '',
-          images: [data.image],
+          images: [imageUrl],
           featured: false,
           rating: 0,
       };
@@ -38,10 +37,14 @@ export default function NewProductPage() {
       router.push('/admin/products');
     } catch (error) {
       console.error("Failed to create product:", error);
+      let description = "Something went wrong. Please try again.";
+      if (error instanceof Error) {
+        description = error.message;
+      }
       toast({
         variant: "destructive",
         title: "Error creating product",
-        description: "Something went wrong. Please try again.",
+        description: description,
       });
     } finally {
       setIsSubmitting(false);

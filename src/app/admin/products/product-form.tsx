@@ -24,11 +24,14 @@ const productFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   description: z.string().min(10, "Description must be at least 10 characters."),
   price: z.coerce.number().min(0.01, "Price must be a positive number."),
+  shippingFee: z.coerce.number().min(0, "Shipping fee cannot be negative."),
   categoryId: z.string().min(1, "Please select a category."),
-  image: z.string().url("Please enter a valid image URL."),
+  image: z.custom<FileList>()
+    .refine((files) => files?.length > 0, 'An image is required.')
+    .refine((files) => files?.[0]?.type?.startsWith("image/"), "Must be an image file."),
 });
 
-type ProductFormValues = z.infer<typeof productFormSchema>;
+export type ProductFormValues = z.infer<typeof productFormSchema>;
 
 interface ProductFormProps {
   initialData?: Product | null;
@@ -44,14 +47,16 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
       name: initialData.name,
       description: initialData.description,
       price: initialData.price,
+      shippingFee: initialData.shippingFee,
       categoryId: initialData.categoryId,
-      image: initialData.image,
+      image: undefined,
     } : {
       name: "",
       description: "",
       price: 0,
+      shippingFee: 0,
       categoryId: "",
-      image: "",
+      image: undefined,
     },
   });
 
@@ -103,6 +108,19 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
                   </FormItem>
                 )}
               />
+               <FormField
+                control={form.control}
+                name="shippingFee"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Shipping Fee</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" placeholder="5.00" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="categoryId"
@@ -129,14 +147,21 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
              <FormField
               control={form.control}
               name="image"
-              render={({ field }) => (
+              render={({ field: { onChange, value, ...rest } }) => (
                 <FormItem>
-                  <FormLabel>Image URL</FormLabel>
+                  <FormLabel>Product Image</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://..." {...field} />
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(event) => {
+                        onChange(event.target.files);
+                      }}
+                      {...rest}
+                    />
                   </FormControl>
                   <FormDescription>
-                    Provide a URL for the main product image. For now, we only support single images.
+                    Upload the main product image.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

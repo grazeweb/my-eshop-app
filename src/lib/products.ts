@@ -1,6 +1,7 @@
 
-import { db } from './firebase';
+import { db, storage } from './firebase';
 import { collection, query, addDoc, getDocs, getDoc, doc, onSnapshot, Unsubscribe, orderBy, where } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product, NewProduct } from './types';
 
 // Listen for real-time updates on products
@@ -63,4 +64,15 @@ export async function getProduct(id: string): Promise<Product | null> {
 export async function addProduct(productData: NewProduct): Promise<void> {
     const productsCol = collection(db, 'products');
     await addDoc(productsCol, productData);
+}
+
+// Upload a product image and return the URL
+export async function uploadProductImage(file: File): Promise<string> {
+    if (!file) {
+        throw new Error("No file provided for upload.");
+    }
+    const storageRef = ref(storage, `products/${Date.now()}-${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    return downloadURL;
 }

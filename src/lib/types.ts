@@ -18,6 +18,7 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  shippingFee: number;
   originalPrice?: number;
   badge?: string;
   image: string;
