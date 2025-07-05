@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { products } from '@/lib/data';
@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ProductReviews } from '@/components/product-reviews';
 import type { Review } from '@/lib/types';
-import { getReviewsForProduct } from '@/lib/reviews';
+import { listenForReviews } from '@/lib/reviews';
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
@@ -25,28 +25,24 @@ export default function ProductPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
 
-  const fetchReviews = useCallback(async () => {
-    if (!params.id) return;
-    setReviewsLoading(true);
-    try {
-        const fetchedReviews = await getReviewsForProduct(params.id);
-        setReviews(fetchedReviews);
-    } catch (error) {
-        console.error("Failed to fetch reviews", error);
-    } finally {
-        setReviewsLoading(false);
-    }
-  }, [params.id]);
-
-  useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
-
   useEffect(() => {
     if (product) {
         setSelectedImage(product.images[0] ?? product.image ?? '');
     }
   }, [product]);
+
+  useEffect(() => {
+    if (!params.id) return;
+    
+    setReviewsLoading(true);
+    const unsubscribe = listenForReviews(params.id, (fetchedReviews) => {
+      setReviews(fetchedReviews);
+      setReviewsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [params.id]);
+
 
   if (!product) {
     notFound();
@@ -161,7 +157,6 @@ export default function ProductPage() {
           averageRating={averageRating} 
           totalReviews={totalReviews} 
           reviewsLoading={reviewsLoading}
-          onReviewSubmitted={fetchReviews}
         />
       </div>
 

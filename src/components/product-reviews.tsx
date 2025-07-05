@@ -26,7 +26,6 @@ interface ProductReviewsProps {
   averageRating: number;
   totalReviews: number;
   reviewsLoading: boolean;
-  onReviewSubmitted: () => void;
 }
 
 const StarRating = ({ rating, size = 'md' }: { rating: number, size?: 'sm' | 'md' }) => {
@@ -43,7 +42,7 @@ const StarRating = ({ rating, size = 'md' }: { rating: number, size?: 'sm' | 'md
   );
 };
 
-export function ProductReviews({ productId, reviews, averageRating, totalReviews, reviewsLoading, onReviewSubmitted }: ProductReviewsProps) {
+export function ProductReviews({ productId, reviews, averageRating, totalReviews, reviewsLoading }: ProductReviewsProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -89,12 +88,11 @@ export function ProductReviews({ productId, reviews, averageRating, totalReviews
 
         toast({ title: 'Review submitted!', description: 'Thank you for your feedback.' });
         
-        // Reset form, close dialog, and trigger refetch
+        // Reset form and close dialog. The snapshot listener will update the list.
         setNewRating(0);
         setReviewTitle('');
         setReviewContent('');
         setIsDialogOpen(false);
-        onReviewSubmitted();
 
     } catch (error) {
         console.error(error);
