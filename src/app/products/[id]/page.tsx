@@ -2,34 +2,52 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { notFound, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
-import { products } from '@/lib/data';
 import { Button } from '@/components/ui/button';
-import { Star, ShoppingCart, Heart, Minus, Plus } from 'lucide-react';
+import { Star, ShoppingCart, Heart, Minus, Plus, Loader2 } from 'lucide-react';
 import { ProductCard } from '@/components/product-card';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { ProductReviews } from '@/components/product-reviews';
-import type { Review } from '@/lib/types';
+import type { Review, Product } from '@/lib/types';
 import { listenForReviews } from '@/lib/reviews';
+import { getProduct, getProducts } from '@/lib/products';
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
-  const product = products.find((p) => p.id === params.id);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
-  const [selectedImage, setSelectedImage] = useState(product?.images[0] ?? product?.image ?? '');
+  const [selectedImage, setSelectedImage] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isWished, setIsWished] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
-    if (product) {
-        setSelectedImage(product.images[0] ?? product.image ?? '');
+    async function loadProductData() {
+        if (!params.id) return;
+        
+        const fetchedProduct = await getProduct(params.id);
+        
+        if (fetchedProduct) {
+            setProduct(fetchedProduct);
+            setSelectedImage(fetchedProduct.images?.[0] || fetchedProduct.image || '');
+
+            const allProducts = await getProducts();
+            const related = allProducts
+                .filter((p) => p.categoryId === fetchedProduct.categoryId && p.id !== fetchedProduct.id)
+                .slice(0, 4);
+            setRelatedProducts(related);
+        } else {
+            console.error("Product not found");
+        }
     }
-  }, [product]);
+    loadProductData();
+  }, [params.id]);
+
 
   useEffect(() => {
     if (!params.id) return;
@@ -51,14 +69,6 @@ export default function ProductPage() {
   }, [params.id]);
 
 
-  if (!product) {
-    notFound();
-  }
-
-  const relatedProducts = products
-    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
-    .slice(0, 4);
-
   const { averageRating, totalReviews } = useMemo(() => {
     if (reviews.length === 0) {
         return { averageRating: 0, totalReviews: 0 };
@@ -78,6 +88,14 @@ export default function ProductPage() {
     });
   }
 
+  if (!product) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-16 w-16 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -94,7 +112,7 @@ export default function ProductPage() {
           </div>
           {/* Thumbnails */}
           <div className="grid grid-cols-5 gap-2">
-            {product.images.map((img, index) => (
+            {product.images?.map((img, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedImage(img)}

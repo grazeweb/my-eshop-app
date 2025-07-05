@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -5,18 +6,24 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import { getProduct } from '@/lib/products';
 
 const cartItems = [
   { productId: '1', quantity: 1 },
   { productId: '5', quantity: 2 },
 ];
-import { products } from '@/lib/data';
 
-export default function CartPage() {
-  const items = cartItems.map(item => {
-    const product = products.find(p => p.id === item.productId);
-    return { ...product, quantity: item.quantity };
-  });
+export default async function CartPage() {
+
+  const itemDetails = await Promise.all(
+    cartItems.map(async (cartItem) => {
+      const product = await getProduct(cartItem.productId);
+      if (!product) return null;
+      return { ...product, quantity: cartItem.quantity };
+    })
+  );
+
+  const items = itemDetails.filter((item): item is NonNullable<typeof item> => item !== null);
 
   const subtotal = items.reduce((acc, item) => acc + (item.price ?? 0) * item.quantity, 0);
   const shipping = 5.00;

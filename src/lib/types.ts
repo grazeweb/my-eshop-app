@@ -1,3 +1,4 @@
+
 import type { Timestamp } from 'firebase/firestore';
 
 export interface Review {
@@ -26,13 +27,15 @@ export interface Product {
   rating: number;
 }
 
+export type NewProduct = Omit<Product, 'id'>;
+
 export interface Category {
   id: string;
   name: string;
 }
 
 export interface Order {
-  id: string;
+  id:string;
   date: string;
   status: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   total: number;

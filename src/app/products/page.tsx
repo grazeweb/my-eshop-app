@@ -3,18 +3,37 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { products, categories } from '@/lib/data';
+import { categories } from '@/lib/data';
 import { ProductCard } from '@/components/product-card';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { getProducts } from '@/lib/products';
+import type { Product } from '@/lib/types';
 
 export default function ProductsPage() {
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProducts() {
+        setLoading(true);
+        try {
+            const allProducts = await getProducts();
+            setProducts(allProducts);
+        } catch (error) {
+            console.error("Failed to fetch products:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
@@ -42,7 +61,7 @@ export default function ProductsPage() {
         selectedCategories.length === 0 || selectedCategories.includes(product.categoryId);
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategories]);
+  }, [searchTerm, selectedCategories, products]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -87,7 +106,11 @@ export default function ProductsPage() {
         </aside>
 
         <main className="w-full md:w-3/4 lg:w-4/5">
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+             <div className="flex justify-center items-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+             </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />

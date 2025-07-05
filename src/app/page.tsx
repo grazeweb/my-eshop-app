@@ -10,11 +10,12 @@ import {
   Undo2,
   CircleDollarSign,
 } from 'lucide-react';
-import { featuredProducts, categories as allCategories } from '@/lib/data';
+import { categories as allCategories } from '@/lib/data';
 import Image from 'next/image';
 import { ProductCard } from '@/components/product-card';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getProducts } from '@/lib/products';
 
 const teamMembers = [
   {
@@ -85,7 +86,9 @@ const shopCategories = allCategories.filter((c) =>
 ).sort((a, b) => categorySlugs.indexOf(a.id) - categorySlugs.indexOf(b.id));
 
 
-export default function Home() {
+export default async function Home() {
+  const featuredProducts = await getProducts({ featured: true });
+
   return (
     <div className="flex flex-col gap-16 md:gap-24 pb-12">
       <section className="relative h-[60vh] md:h-[70vh] w-full flex items-center justify-center text-center text-white bg-gray-800">
