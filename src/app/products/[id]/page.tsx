@@ -25,17 +25,17 @@ export default function ProductPage({ params }: { params: { id:string } }) {
   const [reviewsLoading, setReviewsLoading] = useState(true);
 
   const fetchReviews = useCallback(async () => {
-    if (!product) return;
+    if (!params.id) return;
     setReviewsLoading(true);
     try {
-        const fetchedReviews = await getReviewsForProduct(product.id);
+        const fetchedReviews = await getReviewsForProduct(params.id);
         setReviews(fetchedReviews);
     } catch (error) {
         console.error("Failed to fetch reviews", error);
     } finally {
         setReviewsLoading(false);
     }
-  }, [product]);
+  }, [params.id]);
 
   useEffect(() => {
     fetchReviews();
@@ -51,14 +51,14 @@ export default function ProductPage({ params }: { params: { id:string } }) {
 
   const { averageRating, totalReviews } = useMemo(() => {
     if (reviews.length === 0) {
-        return { averageRating: product.rating, totalReviews: 0 };
+        return { averageRating: 0, totalReviews: 0 };
     }
     const total = reviews.reduce((acc, review) => acc + review.rating, 0);
     return {
         averageRating: total / reviews.length,
         totalReviews: reviews.length,
     };
-  }, [reviews, product.rating]);
+  }, [reviews]);
 
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => {
