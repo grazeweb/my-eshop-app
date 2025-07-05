@@ -1,5 +1,10 @@
 
+"use client";
+
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/auth-context';
 import {
   LayoutDashboard,
   Package,
@@ -7,10 +12,14 @@ import {
   Users,
   Shield,
   Home,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
   const menuItems = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/admin/products', label: 'Products', icon: Package },
@@ -18,6 +27,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/customers', label: 'Customers', icon: Users },
     { href: '/admin/policy-generator', label: 'Policy Generator', icon: Shield },
   ];
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user || user.email !== 'admin@eshop.com') {
+        router.push('/');
+      }
+    }
+  }, [user, loading, router]);
+  
+  if (loading || !user || user.email !== 'admin@eshop.com') {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-16 w-16 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

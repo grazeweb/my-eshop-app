@@ -13,6 +13,7 @@ import {
   LogOut,
   BrainCircuit,
   Loader2,
+  Shield,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
@@ -64,6 +65,18 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                         {item.label}
                     </Link>
                     ))}
+                    {user && user.email === 'admin@eshop.com' && (
+                        <Link
+                            href="/admin"
+                            className={cn(
+                                "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                                pathname.startsWith('/admin') && "bg-muted text-primary"
+                            )}
+                        >
+                            <Shield className="h-4 w-4" />
+                            Admin Panel
+                        </Link>
+                    )}
                      <button
                         onClick={logout}
                         className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
