@@ -1,9 +1,28 @@
 
+"use client";
+
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
 export default function AppearancePage() {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Avoid rendering the switch until the page is mounted to prevent hydration mismatch
+  if (!mounted) {
+    // You can return a placeholder here if you want
+    return null;
+  }
+  
+  const isDarkMode = theme === 'dark';
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold font-headline">Appearance</h1>
@@ -21,7 +40,11 @@ export default function AppearancePage() {
                         Enable dark mode for a different viewing experience.
                     </p>
                 </div>
-                <Switch id="dark-mode" />
+                <Switch 
+                  id="dark-mode" 
+                  checked={isDarkMode}
+                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                />
             </div>
         </CardContent>
       </Card>
