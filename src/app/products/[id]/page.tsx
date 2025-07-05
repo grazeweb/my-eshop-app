@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { products } from '@/lib/data';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,8 @@ import { ProductReviews } from '@/components/product-reviews';
 import type { Review } from '@/lib/types';
 import { getReviewsForProduct } from '@/lib/reviews';
 
-export default function ProductPage({ params }: { params: { id:string } }) {
+export default function ProductPage() {
+  const params = useParams<{ id: string }>();
   const product = products.find((p) => p.id === params.id);
   
   const [selectedImage, setSelectedImage] = useState(product?.images[0] ?? product?.image ?? '');
@@ -40,6 +41,12 @@ export default function ProductPage({ params }: { params: { id:string } }) {
   useEffect(() => {
     fetchReviews();
   }, [fetchReviews]);
+
+  useEffect(() => {
+    if (product) {
+        setSelectedImage(product.images[0] ?? product.image ?? '');
+    }
+  }, [product]);
 
   if (!product) {
     notFound();
