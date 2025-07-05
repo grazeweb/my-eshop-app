@@ -5,3 +5,14 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
+
+# To add secret environment variables to your backend, you can use the `env` key.
+# Secrets are stored in Google Cloud Secret Manager. You can create a new secret by
+# visiting https://console.cloud.google.com/security/secret-manager in the Google Cloud Console.
+#
+# Once you have a secret, you can make it available to your app by uncommenting
+# and configuring the section below.
+#
+# env:
+#   - variable: MY_API_KEY # The name of the environment variable in your app
+#     secret: your-secret-name-in-secret-manager # The name of the secret you created
