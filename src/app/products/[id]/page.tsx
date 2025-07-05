@@ -35,10 +35,17 @@ export default function ProductPage() {
     if (!params.id) return;
     
     setReviewsLoading(true);
-    const unsubscribe = listenForReviews(params.id, (fetchedReviews) => {
-      setReviews(fetchedReviews);
-      setReviewsLoading(false);
-    });
+    const unsubscribe = listenForReviews(
+        params.id, 
+        (fetchedReviews) => {
+            setReviews(fetchedReviews);
+            setReviewsLoading(false);
+        },
+        (error) => {
+            console.error("Failed to load reviews:", error);
+            setReviewsLoading(false);
+        }
+    );
 
     return () => unsubscribe();
   }, [params.id]);
