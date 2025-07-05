@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Star, MessageSquare, Loader2 } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -23,8 +23,6 @@ import { formatDistanceToNow } from 'date-fns';
 interface ProductReviewsProps {
   productId: string;
   reviews: Review[];
-  averageRating: number;
-  totalReviews: number;
   reviewsLoading: boolean;
 }
 
@@ -42,7 +40,7 @@ const StarRating = ({ rating, size = 'md' }: { rating: number, size?: 'sm' | 'md
   );
 };
 
-export function ProductReviews({ productId, reviews, averageRating, totalReviews, reviewsLoading }: ProductReviewsProps) {
+export function ProductReviews({ productId, reviews, reviewsLoading }: ProductReviewsProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -52,14 +50,28 @@ export function ProductReviews({ productId, reviews, averageRating, totalReviews
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const ratingDistribution = [5, 4, 3, 2, 1].map(star => {
-    const count = reviews.filter(r => r.rating === star).length;
+  const { averageRating, totalReviews } = useMemo(() => {
+    if (!reviews || reviews.length === 0) {
+      return { averageRating: 0, totalReviews: 0 };
+    }
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
     return {
-      star,
-      count,
-      percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0,
+      averageRating: totalRating / reviews.length,
+      totalReviews: reviews.length,
     };
-  });
+  }, [reviews]);
+
+  const ratingDistribution = useMemo(() => {
+    return [5, 4, 3, 2, 1].map(star => {
+      const count = reviews.filter(r => r.rating === star).length;
+      return {
+        star,
+        count,
+        percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0,
+      };
+    });
+  }, [reviews, totalReviews]);
+
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +100,6 @@ export function ProductReviews({ productId, reviews, averageRating, totalReviews
 
         toast({ title: 'Review submitted!', description: 'Thank you for your feedback.' });
         
-        // Reset form and close dialog. The snapshot listener will update the list.
         setNewRating(0);
         setReviewTitle('');
         setReviewContent('');

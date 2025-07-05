@@ -68,18 +68,6 @@ export default function ProductPage() {
     return () => unsubscribe();
   }, [params.id]);
 
-
-  const { averageRating, totalReviews } = useMemo(() => {
-    if (reviews.length === 0) {
-        return { averageRating: 0, totalReviews: 0 };
-    }
-    const total = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return {
-        averageRating: total / reviews.length,
-        totalReviews: reviews.length,
-    };
-  }, [reviews]);
-
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => {
         const newQuantity = prev + amount;
@@ -102,6 +90,9 @@ export default function ProductPage() {
       ? selectedImage
       : "https://placehold.co/600x600.png";
 
+  const totalReviews = reviews.length;
+  const averageRating = totalReviews > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews : 0;
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -118,7 +109,7 @@ export default function ProductPage() {
           </div>
           {/* Thumbnails */}
           <div className="grid grid-cols-5 gap-2">
-            {product.images?.map((img, index) => {
+            {(product.images ?? []).map((img, index) => {
               const imageSrc =
                 img && (img.startsWith("http://") || img.startsWith("https://"))
                   ? img
@@ -190,9 +181,7 @@ export default function ProductPage() {
       <div id="reviews">
         <ProductReviews
           productId={product.id}
-          reviews={reviews} 
-          averageRating={averageRating} 
-          totalReviews={totalReviews} 
+          reviews={reviews}
           reviewsLoading={reviewsLoading}
         />
       </div>
