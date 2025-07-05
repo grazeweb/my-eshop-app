@@ -12,6 +12,7 @@ import { Package, Loader2 } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { createUserProfile } from '@/lib/user';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -26,8 +27,10 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      if (userCredential.user) {
-        await updateProfile(userCredential.user, { displayName: name });
+      const user = userCredential.user;
+      if (user) {
+        await updateProfile(user, { displayName: name });
+        await createUserProfile(user, name);
       }
       toast({
         title: "Account Created",

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { updateProfile, updatePassword, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'firebase/auth';
 import {
@@ -21,6 +21,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getUserProfile, saveUserAddress } from '@/lib/user';
+import type { ShippingAddress } from '@/lib/types';
 
 export default function SettingsPage() {
     const { user, loading } = useAuth();
@@ -29,6 +31,12 @@ export default function SettingsPage() {
     // Profile state
     const [displayName, setDisplayName] = useState(user?.displayName ?? '');
     const [profileLoading, setProfileLoading] = useState(false);
+
+    // Address state
+    const [address, setAddress] = useState<ShippingAddress>({
+        firstName: '', lastName: '', address: '', city: '', zip: ''
+    });
+    const [addressLoading, setAddressLoading] = useState(false);
 
     // Password state
     const [currentPassword, setCurrentPassword] = useState('');
@@ -39,6 +47,17 @@ export default function SettingsPage() {
     // Delete account state
     const [deleteConfirmText, setDeleteConfirmText] = useState('');
     const [deleteLoading, setDeleteLoading] = useState(false);
+    
+    useEffect(() => {
+        if (user) {
+            setDisplayName(user.displayName || '');
+            getUserProfile(user.uid).then(profile => {
+                if (profile?.address) {
+                    setAddress(profile.address);
+                }
+            });
+        }
+    }, [user]);
 
     const handleProfileUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,6 +73,24 @@ export default function SettingsPage() {
         }
     };
     
+    const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAddress(prev => ({ ...prev, [e.target.id]: e.target.value }));
+    };
+
+    const handleAddressSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) return;
+        setAddressLoading(true);
+        try {
+            await saveUserAddress(user.uid, address);
+            toast({ title: "Address saved successfully!" });
+        } catch (error: any) {
+            toast({ variant: 'destructive', title: 'Error saving address', description: error.message });
+        } finally {
+            setAddressLoading(false);
+        }
+    };
+
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user || !user.email) return;
@@ -88,10 +125,7 @@ export default function SettingsPage() {
         try {
             await deleteUser(user);
             toast({ title: 'Account deleted successfully.' });
-            // onAuthStateChanged in AuthProvider will handle the user state change
-            // and the AccountLayout will redirect to /login
         } catch (error: any) {
-            // Re-authentication is likely required.
             toast({ variant: 'destructive', title: 'Error deleting account', description: "This is a sensitive operation. Please log out and log back in before trying again." });
         } finally {
             setDeleteLoading(false);
@@ -125,6 +159,47 @@ export default function SettingsPage() {
                         <Button type="submit" disabled={profileLoading}>
                             {profileLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Save Changes
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Card>
+
+            <Card>
+                <form onSubmit={handleAddressSave}>
+                    <CardHeader>
+                        <CardTitle>Shipping Address</CardTitle>
+                        <CardDescription>Update your default shipping address.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="firstName">First Name</Label>
+                                <Input id="firstName" value={address.firstName} onChange={handleAddressChange} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="lastName">Last Name</Label>
+                                <Input id="lastName" value={address.lastName} onChange={handleAddressChange} />
+                            </div>
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="address">Address</Label>
+                            <Input id="address" value={address.address} onChange={handleAddressChange} />
+                        </div>
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="city">City</Label>
+                                <Input id="city" value={address.city} onChange={handleAddressChange} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="zip">ZIP Code</Label>
+                                <Input id="zip" value={address.zip} onChange={handleAddressChange} />
+                            </div>
+                        </div>
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit" disabled={addressLoading}>
+                            {addressLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Save Address
                         </Button>
                     </CardFooter>
                 </form>

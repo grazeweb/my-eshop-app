@@ -51,6 +51,13 @@ export interface ShippingAddress {
     city: string;
     zip: string;
 }
+
+export interface UserProfile {
+    id: string; // Corresponds to Firebase Auth UID
+    displayName: string;
+    email: string;
+    address?: ShippingAddress;
+}
   
 export interface Order {
   id: string; // Firestore document ID

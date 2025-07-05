@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +14,8 @@ import { createOrder } from '@/lib/orders';
 import { useToast } from '@/hooks/use-toast';
 import type { ShippingAddress } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import { getUserProfile, saveUserAddress } from '@/lib/user';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function CheckoutPage() {
   const { cartItems, cartTotal, shippingTotal, clearCart } = useCart();
@@ -28,7 +30,18 @@ export default function CheckoutPage() {
     city: '',
     zip: '',
   });
+  const [saveAddress, setSaveAddress] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+        getUserProfile(user.uid).then(profile => {
+            if (profile?.address) {
+                setShippingAddress(profile.address);
+            }
+        });
+    }
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -50,7 +63,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Basic validation
     if (Object.values(shippingAddress).some(field => field.trim() === '')) {
       toast({ variant: 'destructive', title: 'Please fill out all shipping fields.' });
       return;
@@ -58,9 +70,12 @@ export default function CheckoutPage() {
 
     setLoading(true);
     try {
+      if (saveAddress) {
+        await saveUserAddress(user.uid, shippingAddress);
+      }
       await createOrder({
         userId: user.uid,
-        customerName: user.displayName || `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
         customerEmail: user.email!,
         items: cartItems,
         totalAmount,
@@ -108,6 +123,12 @@ export default function CheckoutPage() {
                 <div className="space-y-2">
                   <Label htmlFor="zip">ZIP Code</Label>
                   <Input id="zip" placeholder="12345" value={shippingAddress.zip} onChange={handleInputChange} required />
+                </div>
+                 <div className="col-span-2 flex items-center space-x-2 pt-2">
+                    <Checkbox id="save-address" checked={saveAddress} onCheckedChange={(checked) => setSaveAddress(!!checked)} />
+                    <Label htmlFor="save-address" className="text-sm font-normal cursor-pointer">
+                        Save this address for future orders
+                    </Label>
                 </div>
               </CardContent>
             </Card>
