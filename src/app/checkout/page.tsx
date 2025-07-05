@@ -16,7 +16,7 @@ import type { ShippingAddress } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 
 export default function CheckoutPage() {
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, cartTotal, shippingTotal, clearCart } = useCart();
   const { user } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
@@ -35,8 +35,7 @@ export default function CheckoutPage() {
     setShippingAddress(prev => ({ ...prev, [id]: value }));
   };
 
-  const shippingFee = 5.00;
-  const totalAmount = cartTotal + shippingFee;
+  const totalAmount = cartTotal + shippingTotal;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +60,9 @@ export default function CheckoutPage() {
     try {
       await createOrder({
         userId: user.uid,
-        items: cartItems.map(item => ({...item, shippingFee: 0})),
+        customerName: user.displayName || `${shippingAddress.firstName} ${shippingAddress.lastName}`,
+        customerEmail: user.email!,
+        items: cartItems,
         totalAmount,
         shippingAddress,
         paymentMethod: 'Cash on Delivery',
@@ -136,7 +137,7 @@ export default function CheckoutPage() {
                 ))}
                 <div className="border-t my-2"></div>
                 <div className="flex justify-between text-sm"><span>Subtotal</span> <span>${cartTotal.toFixed(2)}</span></div>
-                <div className="flex justify-between text-sm text-muted-foreground"><span>Shipping</span> <span>${shippingFee.toFixed(2)}</span></div>
+                <div className="flex justify-between text-sm text-muted-foreground"><span>Shipping</span> <span>${shippingTotal.toFixed(2)}</span></div>
                 <div className="border-t my-2"></div>
                 <div className="flex justify-between font-bold text-lg"><span>Total</span> <span>${totalAmount.toFixed(2)}</span></div>
               </CardContent>

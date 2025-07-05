@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, notFound } from 'next/navigation';
 import { getOrderById } from '@/lib/orders';
 import type { Order } from '@/lib/types';
@@ -33,6 +33,13 @@ export default function OrderDetailsPage() {
     }
   }, [params.id]);
 
+  const { subtotal, shippingFee } = useMemo(() => {
+    if (!order) return { subtotal: 0, shippingFee: 0 };
+    const subtotal = order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const shippingFee = order.totalAmount - subtotal;
+    return { subtotal, shippingFee };
+  }, [order]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -53,8 +60,6 @@ export default function OrderDetailsPage() {
       default: return 0;
     }
   };
-  
-  const shippingFee = 5.00; // Assuming a fixed shipping fee as in checkout
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -121,7 +126,7 @@ export default function OrderDetailsPage() {
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${(order.totalAmount - shippingFee).toFixed(2)}</span>
+                    <span>${subtotal.toFixed(2)}</span>
                   </div>
                    <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>

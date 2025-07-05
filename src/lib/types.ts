@@ -14,7 +14,7 @@ export interface Review {
 }
 
 export interface Product {
-  id: string;
+  id:string;
   name: string;
   description: string;
   price: number;
@@ -55,6 +55,8 @@ export interface ShippingAddress {
 export interface Order {
   id: string; // Firestore document ID
   userId: string;
+  customerName: string;
+  customerEmail: string;
   items: CartItem[];
   totalAmount: number;
   shippingAddress: ShippingAddress;

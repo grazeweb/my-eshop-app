@@ -11,10 +11,9 @@ import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/contexts/cart-context';
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, removeFromCart, cartTotal } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, cartTotal, shippingTotal } = useCart();
 
-  const shipping = 5.00;
-  const total = cartTotal + shipping;
+  const total = cartTotal + shippingTotal;
 
   if (cartItems.length === 0) {
     return (
@@ -98,7 +97,7 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>${shipping.toFixed(2)}</span>
+                <span>${shippingTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>

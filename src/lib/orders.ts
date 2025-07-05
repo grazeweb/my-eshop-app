@@ -1,6 +1,6 @@
 
 import { db } from './firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, getDoc, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, getDoc, orderBy, Timestamp, onSnapshot, Unsubscribe, updateDoc } from 'firebase/firestore';
 import type { Order } from './types';
 
 // This type is for creating a new order, as 'id' and 'createdAt' are auto-generated.
@@ -84,4 +84,35 @@ export async function getProductsBoughtCountForUser(userId: string): Promise<num
     if (!userId) return 0;
     const orders = await getOrdersForUser(userId);
     return orders.reduce((acc, order) => acc + order.items.reduce((itemAcc, item) => itemAcc + item.quantity, 0), 0);
+}
+
+// Listen for all orders (for admin)
+export function listenForAllOrders(
+  callback: (orders: Order[]) => void,
+  onError: (error: Error) => void
+): Unsubscribe {
+  const ordersCol = collection(db, 'orders');
+  const q = query(ordersCol, orderBy('createdAt', 'desc'));
+
+  const unsubscribe = onSnapshot(q, 
+    (querySnapshot) => {
+      const orders = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Order));
+      callback(orders);
+    },
+    (error) => {
+      console.error("Error listening for orders:", error);
+      onError(error);
+    }
+  );
+
+  return unsubscribe;
+}
+
+// Update an order's status (for admin)
+export async function updateOrderStatus(orderId: string, status: Order['status']): Promise<void> {
+    const orderRef = doc(db, 'orders', orderId);
+    await updateDoc(orderRef, { status });
 }
