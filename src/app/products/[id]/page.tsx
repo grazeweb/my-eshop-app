@@ -95,6 +95,12 @@ export default function ProductPage() {
       </div>
     );
   }
+  
+  const mainImageSrc =
+    selectedImage &&
+    (selectedImage.startsWith("http://") || selectedImage.startsWith("https://"))
+      ? selectedImage
+      : "https://placehold.co/600x600.png";
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -103,7 +109,7 @@ export default function ProductPage() {
           {/* Main Image */}
           <div className="aspect-square relative rounded-lg overflow-hidden border group mb-4">
             <Image
-              src={selectedImage}
+              src={mainImageSrc}
               alt={product.name}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -112,24 +118,30 @@ export default function ProductPage() {
           </div>
           {/* Thumbnails */}
           <div className="grid grid-cols-5 gap-2">
-            {product.images?.map((img, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(img)}
-                className={cn(
-                  'aspect-square relative rounded-md overflow-hidden border-2 transition',
-                  selectedImage === img ? 'border-primary' : 'border-transparent'
-                )}
-              >
-                <Image
-                  src={img}
-                  alt={`${product.name} thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  data-ai-hint="product image"
-                />
-              </button>
-            ))}
+            {product.images?.map((img, index) => {
+              const imageSrc =
+                img && (img.startsWith("http://") || img.startsWith("https://"))
+                  ? img
+                  : "https://placehold.co/100x100.png";
+              return (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(img)}
+                  className={cn(
+                    'aspect-square relative rounded-md overflow-hidden border-2 transition',
+                    selectedImage === img ? 'border-primary' : 'border-transparent'
+                  )}
+                >
+                  <Image
+                    src={imageSrc}
+                    alt={`${product.name} thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    data-ai-hint="product image"
+                  />
+                </button>
+              )
+            })}
           </div>
         </div>
         <div className="flex flex-col">
