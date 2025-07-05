@@ -46,32 +46,40 @@ export default function CartPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {cartItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-4">
-                          <div className="relative h-16 w-16 rounded-md overflow-hidden">
-                             <Image src={item.image ?? ''} alt={item.name ?? ''} fill style={{objectFit: 'cover'}} data-ai-hint="product image" />
+                  {cartItems.map((item) => {
+                    const imageSrc =
+                      item.image &&
+                      (item.image.startsWith("http://") || item.image.startsWith("https://"))
+                        ? item.image
+                        : "https://placehold.co/64x64.png";
+
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-4">
+                            <div className="relative h-16 w-16 rounded-md overflow-hidden">
+                              <Image src={imageSrc} alt={item.name ?? ''} fill style={{objectFit: 'cover'}} data-ai-hint="product image" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{item.name}</p>
+                              <Button variant="ghost" size="sm" className="text-muted-foreground p-0 h-auto hover:bg-transparent hover:text-destructive" onClick={() => removeFromCart(item.id)}>
+                                  <Trash2 className="h-4 w-4 mr-1"/> Remove
+                              </Button>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{item.name}</p>
-                            <Button variant="ghost" size="sm" className="text-muted-foreground p-0 h-auto hover:bg-transparent hover:text-destructive" onClick={() => removeFromCart(item.id)}>
-                                <Trash2 className="h-4 w-4 mr-1"/> Remove
-                            </Button>
+                        </TableCell>
+                        <TableCell>${item.price?.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus className="h-4 w-4"/></Button>
+                            <Input type="number" value={item.quantity} className="w-14 h-8 text-center" readOnly />
+                            <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus className="h-4 w-4"/></Button>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>${item.price?.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus className="h-4 w-4"/></Button>
-                          <Input type="number" value={item.quantity} className="w-14 h-8 text-center" readOnly />
-                          <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus className="h-4 w-4"/></Button>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">${(item.price * item.quantity).toFixed(2)}</TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell className="text-right">${(item.price * item.quantity).toFixed(2)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>
