@@ -91,6 +91,18 @@ export default function ProductPage() {
     checkPurchase();
   }, [user, product]);
 
+  const { totalReviews, averageRating } = useMemo(() => {
+    const totalReviews = reviews.length;
+    if (totalReviews === 0) {
+      return { totalReviews: 0, averageRating: 0 };
+    }
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return {
+      totalReviews,
+      averageRating: totalRating / totalReviews,
+    };
+  }, [reviews]);
+
 
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => {
@@ -113,18 +125,6 @@ export default function ProductPage() {
     (selectedImage.startsWith("http://") || selectedImage.startsWith("https://"))
       ? selectedImage
       : "https://placehold.co/600x600.png";
-
-  const { totalReviews, averageRating } = useMemo(() => {
-    const totalReviews = reviews.length;
-    if (totalReviews === 0) {
-      return { totalReviews: 0, averageRating: 0 };
-    }
-    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return {
-      totalReviews,
-      averageRating: totalRating / totalReviews,
-    };
-  }, [reviews]);
 
   return (
     <div className="container mx-auto px-4 py-12">
