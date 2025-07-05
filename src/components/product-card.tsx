@@ -9,13 +9,19 @@ import { Star } from 'lucide-react';
 export function ProductCard({ product }: { product: Product }) {
   const category = categories.find((c) => c.id === product.categoryId);
 
+  const imageSrc =
+    product.image &&
+    (product.image.startsWith("http://") || product.image.startsWith("https://"))
+      ? product.image
+      : "https://placehold.co/400x400.png";
+
   return (
     <Card className="group w-full overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md">
       <Link href={`/products/${product.id}`} className="block">
         <div className="relative bg-muted">
           <div className="aspect-square w-full overflow-hidden">
              <Image
-              src={product.image}
+              src={imageSrc}
               alt={product.name}
               fill
               style={{ objectFit: 'cover' }}
