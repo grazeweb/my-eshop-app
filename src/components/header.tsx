@@ -29,6 +29,8 @@ import {
 } from '@/components/ui/navigation-menu';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { useCart } from '@/contexts/cart-context';
+import { Badge } from '@/components/ui/badge';
 
 const apparelComponents: { title: string; href: string; description: string }[] = [
   {
@@ -89,6 +91,7 @@ export function Header() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const { user, logout } = useAuth();
+  const { cartCount } = useCart();
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -117,11 +120,11 @@ export function Header() {
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/products" className={navigationMenuTriggerStyle()}>
+                  <Link href="/products" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       All Products
-                    </Link>
-                  </NavigationMenuLink>
+                    </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
                   <NavigationMenuTrigger>Apparel</NavigationMenuTrigger>
@@ -174,18 +177,18 @@ export function Header() {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/products?category=footwear" className={navigationMenuTriggerStyle()}>
+                   <Link href="/products?category=footwear" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       Footwear
-                    </Link>
-                  </NavigationMenuLink>
+                    </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <Link href="/" className={navigationMenuTriggerStyle()}>
+                  <Link href="/" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       Home
-                    </Link>
-                  </NavigationMenuLink>
+                    </NavigationMenuLink>
+                  </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
@@ -232,7 +235,10 @@ export function Header() {
                 />
             </form>
             <Button variant="ghost" size="icon" asChild>
-                <Link href="/cart">
+                <Link href="/cart" className="relative">
+                    {cartCount > 0 && (
+                        <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 justify-center p-1 text-xs">{cartCount}</Badge>
+                    )}
                     <ShoppingCart className="h-5 w-5" />
                     <span className="sr-only">Shopping Cart</span>
                 </Link>
@@ -301,6 +307,7 @@ const ListItem = React.forwardRef<
       <NavigationMenuLink asChild>
         <Link
           ref={ref}
+          href={props.href || ''}
           className={cn(
             'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
             className

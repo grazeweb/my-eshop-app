@@ -7,6 +7,7 @@ import { Footer } from '@/components/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/auth-context';
 import { usePathname } from 'next/navigation';
+import { CartProvider } from '@/contexts/cart-context';
 
 export default function RootLayout({
   children,
@@ -27,12 +28,14 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
+          <CartProvider>
             <div className="flex flex-col min-h-screen">
               <Header />
               <main className="flex-grow">{children}</main>
               <Footer />
             </div>
-          <Toaster />
+            <Toaster />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

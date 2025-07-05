@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState, useEffect } from 'react';
 import {
     Table,
     TableBody,
@@ -9,11 +12,28 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { orders } from '@/lib/data';
-import { Eye } from 'lucide-react';
+import { Eye, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { useAuth } from '@/contexts/auth-context';
+import { getOrdersForUser } from '@/lib/orders';
+import type { Order } from '@/lib/types';
+import { format } from 'date-fns';
 
 export default function OrderHistoryPage() {
+    const { user } = useAuth();
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) {
+            getOrdersForUser(user.uid)
+                .then(setOrders)
+                .finally(() => setLoading(false));
+        } else {
+            setLoading(false);
+        }
+    }, [user]);
+
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold font-headline">Order History</h1>
@@ -31,21 +51,35 @@ export default function OrderHistoryPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {orders.map((order) => (
-                                <TableRow key={order.id}>
-                                    <TableCell className="font-medium">{order.id}</TableCell>
-                                    <TableCell>{order.date}</TableCell>
-                                    <TableCell>{order.status}</TableCell>
-                                    <TableCell>${order.total.toFixed(2)}</TableCell>
-                                    <TableCell>
-                                        <Button asChild variant="outline" size="sm">
-                                            <Link href={`/account/orders/${order.id}`}>
-                                                <Eye className="h-4 w-4 mr-2" /> View
-                                            </Link>
-                                        </Button>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center h-24">
+                                        <Loader2 className="mx-auto h-6 w-6 animate-spin" />
                                     </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : orders.length > 0 ? (
+                                orders.map((order) => (
+                                    <TableRow key={order.id}>
+                                        <TableCell className="font-medium">#{order.id.slice(0, 6)}</TableCell>
+                                        <TableCell>{order.createdAt ? format(order.createdAt.toDate(), 'MMMM d, yyyy') : 'N/A'}</TableCell>
+                                        <TableCell>{order.status}</TableCell>
+                                        <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                                        <TableCell>
+                                            <Button asChild variant="outline" size="sm">
+                                                <Link href={`/account/orders/${order.id}`}>
+                                                    <Eye className="h-4 w-4 mr-2" /> View
+                                                </Link>
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center h-24">
+                                        You have no orders yet.
+                                    </TableCell>
+                                </TableRow>
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>

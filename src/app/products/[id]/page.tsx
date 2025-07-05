@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Star, ShoppingCart, Heart, Minus, Plus, Loader2 } from 'lucide-react';
@@ -15,11 +15,18 @@ import type { Review, Product } from '@/lib/types';
 import { listenForReviews } from '@/lib/reviews';
 import { getProduct, getProducts } from '@/lib/products';
 import { useAuth } from '@/contexts/auth-context';
-import { checkIfUserPurchasedProduct } from '@/lib/orders';
+import { checkIfUserPurchasedProduct, getOrderCountForUser } from '@/lib/orders';
+import { useCart } from '@/contexts/cart-context';
+import { useToast } from '@/hooks/use-toast';
+import { listenForWishlist, addToWishlist, removeFromWishlist } from '@/lib/wishlist';
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const { user } = useAuth();
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
@@ -31,6 +38,18 @@ export default function ProductPage() {
 
   const [hasPurchased, setHasPurchased] = useState(false);
   const [purchaseStatusLoading, setPurchaseStatusLoading] = useState(true);
+
+  const { totalReviews, averageRating } = useMemo(() => {
+    const totalReviews = reviews.length;
+    if (totalReviews === 0) {
+      return { totalReviews: 0, averageRating: 0 };
+    }
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return {
+      totalReviews,
+      averageRating: totalRating / totalReviews,
+    };
+  }, [reviews]);
 
   useEffect(() => {
     async function loadProductData() {
@@ -75,15 +94,27 @@ export default function ProductPage() {
   }, [params.id]);
 
   useEffect(() => {
+    if (!user || !product) {
+      setIsWished(false);
+      return;
+    };
+
+    const unsubscribe = listenForWishlist(user.uid, (productIds) => {
+        setIsWished(productIds.includes(product.id));
+    });
+
+    return () => unsubscribe();
+  }, [user, product]);
+
+
+  useEffect(() => {
     async function checkPurchase() {
-      // Don't check if user is not logged in.
       if (user && product) {
         setPurchaseStatusLoading(true);
         const purchased = await checkIfUserPurchasedProduct(user.uid, product.id);
         setHasPurchased(purchased);
         setPurchaseStatusLoading(false);
       } else {
-        // If there's no user, they definitely haven't purchased.
         setHasPurchased(false);
         setPurchaseStatusLoading(false);
       }
@@ -91,17 +122,31 @@ export default function ProductPage() {
     checkPurchase();
   }, [user, product]);
 
-  const { totalReviews, averageRating } = useMemo(() => {
-    const totalReviews = reviews.length;
-    if (totalReviews === 0) {
-      return { totalReviews: 0, averageRating: 0 };
+  const handleWishlistToggle = async () => {
+    if (!user) {
+        toast({
+            variant: "destructive",
+            title: "Please login",
+            description: "You need to be logged in to manage your wishlist.",
+        });
+        router.push('/login');
+        return;
     }
-    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-    return {
-      totalReviews,
-      averageRating: totalRating / totalReviews,
-    };
-  }, [reviews]);
+    if (!product) return;
+
+    try {
+        if (isWished) {
+            await removeFromWishlist(user.uid, product.id);
+            toast({ title: "Removed from wishlist" });
+        } else {
+            await addToWishlist(user.uid, product.id);
+            toast({ title: "Added to wishlist" });
+        }
+    } catch (error) {
+        console.error("Failed to update wishlist:", error);
+        toast({ variant: "destructive", title: "Something went wrong" });
+    }
+  }
 
 
   const handleQuantityChange = (amount: number) => {
@@ -199,10 +244,10 @@ export default function ProductPage() {
             </div>
 
             <div className="flex items-stretch gap-4">
-                <Button size="lg" className="flex-grow">
-                <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                <Button size="lg" className="flex-grow" onClick={() => addToCart(product, quantity)}>
+                    <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
                 </Button>
-                <Button variant="outline" size="icon" className="w-12 h-auto" onClick={() => setIsWished(!isWished)}>
+                <Button variant="outline" size="icon" className="w-12 h-auto" onClick={handleWishlistToggle}>
                     <Heart className={cn("h-6 w-6 transition-colors", isWished && "fill-destructive text-destructive")} />
                 </Button>
             </div>

@@ -1,13 +1,45 @@
-import { notFound } from 'next/navigation';
-import { orders } from '@/lib/data';
+
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useParams, notFound } from 'next/navigation';
+import { getOrderById } from '@/lib/orders';
+import type { Order } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Progress } from '@/components/ui/progress';
+import { Loader2 } from 'lucide-react';
+import { format } from 'date-fns';
 
-export default function OrderDetailsPage({ params }: { params: { id: string } }) {
-  const order = orders.find((o) => o.id === params.id);
+export default function OrderDetailsPage() {
+  const params = useParams<{ id: string }>();
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (params.id) {
+      getOrderById(params.id)
+        .then(orderData => {
+          if (orderData) {
+            setOrder(orderData);
+          } else {
+            // This will trigger notFound() outside of the promise chain
+            setOrder(null);
+          }
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-16 w-16 animate-spin" />
+      </div>
+    );
+  }
 
   if (!order) {
     notFound();
@@ -21,6 +53,8 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
       default: return 0;
     }
   };
+  
+  const shippingFee = 5.00; // Assuming a fixed shipping fee as in checkout
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -29,11 +63,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
           <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>
               <CardTitle className="text-2xl font-headline">Order Details</CardTitle>
-              <p className="text-muted-foreground mt-1">Order ID: {order.id}</p>
+              <p className="text-muted-foreground mt-1">Order ID: #{order.id.slice(0, 6)}</p>
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Order Placed</p>
-              <p className="font-medium">{order.date}</p>
+              <p className="font-medium">{order.createdAt ? format(order.createdAt.toDate(), 'MMMM d, yyyy') : 'N/A'}</p>
             </div>
           </div>
         </CardHeader>
@@ -60,13 +94,13 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 {order.items.map((item, index) => (
                   <li key={index} className="flex items-center gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
-                      <Image src={item.product.image} alt={item.product.name} fill style={{objectFit:'cover'}} data-ai-hint="product image"/>
+                      <Image src={item.image} alt={item.name} fill style={{objectFit:'cover'}} data-ai-hint="product image"/>
                     </div>
                     <div className="flex-grow">
-                      <p className="font-medium">{item.product.name}</p>
+                      <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
                     </div>
-                    <p className="font-medium">${(item.product.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
                   </li>
                 ))}
               </ul>
@@ -76,9 +110,9 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
               <div>
                 <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>
                 <div className="text-sm text-muted-foreground">
-                  <p>John Doe</p>
-                  <p>123 Main St</p>
-                  <p>Anytown, USA 12345</p>
+                  <p>{order.shippingAddress.firstName} {order.shippingAddress.lastName}</p>
+                  <p>{order.shippingAddress.address}</p>
+                  <p>{order.shippingAddress.city}, {order.shippingAddress.zip}</p>
                 </div>
               </div>
               
@@ -87,16 +121,16 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${order.total.toFixed(2)}</span>
+                    <span>${(order.totalAmount - shippingFee).toFixed(2)}</span>
                   </div>
                    <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span>$5.00</span>
+                    <span>${shippingFee.toFixed(2)}</span>
                   </div>
                   <Separator className="my-2"/>
                   <div className="flex justify-between font-bold">
                     <span>Total</span>
-                    <span>${(order.total + 5.00).toFixed(2)}</span>
+                    <span>${order.totalAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

@@ -35,13 +35,30 @@ export interface Category {
   name: string;
 }
 
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  shippingFee: number;
+}
+
+export interface ShippingAddress {
+    firstName: string;
+    lastName: string;
+    address: string;
+    city: string;
+    zip: string;
+}
+  
 export interface Order {
-  id:string;
-  date: string;
+  id: string; // Firestore document ID
+  userId: string;
+  items: CartItem[];
+  totalAmount: number;
+  shippingAddress: ShippingAddress;
   status: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
-  total: number;
-  items: {
-    product: Product;
-    quantity: number;
-  }[];
+  paymentMethod: 'Cash on Delivery';
+  createdAt: Timestamp;
 }
