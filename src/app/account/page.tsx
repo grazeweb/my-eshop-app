@@ -3,10 +3,9 @@
 
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, ShoppingBag, Heart } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { ShoppingBag, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { getProductsBoughtCountForUser } from '@/lib/orders';
+import { listenForUserOrders } from '@/lib/orders';
 import { listenForWishlist } from '@/lib/wishlist';
 
 export default function AccountDashboardPage() {
@@ -16,14 +15,32 @@ export default function AccountDashboardPage() {
 
   useEffect(() => {
     if (user) {
-      // Fetch products bought count
-      getProductsBoughtCountForUser(user.uid).then(setProductsBought);
+      // Listen for orders and calculate product count in real-time
+      const unsubscribeOrders = listenForUserOrders(
+        user.uid,
+        (fetchedOrders) => {
+          const count = fetchedOrders.reduce(
+            (acc, order) => acc + order.items.reduce((itemAcc, item) => itemAcc + item.quantity, 0),
+            0
+          );
+          setProductsBought(count);
+        },
+        (error) => {
+          console.error("Failed to listen for user orders:", error);
+          // Optionally handle the error in the UI
+        }
+      );
       
       // Listen for wishlist count
-      const unsubscribe = listenForWishlist(user.uid, (productIds) => {
+      const unsubscribeWishlist = listenForWishlist(user.uid, (productIds) => {
         setWishlistCount(productIds.length);
       });
-      return () => unsubscribe();
+
+      // Cleanup listeners on component unmount
+      return () => {
+        unsubscribeOrders();
+        unsubscribeWishlist();
+      };
     }
   }, [user]);
 
