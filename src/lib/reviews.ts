@@ -1,6 +1,7 @@
 import { db } from './firebase';
 import { collection, query, where, addDoc, serverTimestamp, orderBy, Timestamp, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import type { Review } from './types';
+import { checkIfUserPurchasedProduct } from './orders';
 
 // This type is for creating a new review, as 'id' and 'createdAt' are auto-generated.
 export type NewReview = Omit<Review, 'id' | 'createdAt'>;
@@ -36,6 +37,11 @@ export function listenForReviews(
 
 
 export async function addReview(reviewData: NewReview): Promise<void> {
+    const hasPurchased = await checkIfUserPurchasedProduct(reviewData.authorId, reviewData.productId);
+    if (!hasPurchased) {
+        throw new Error("You can only review products that have been delivered.");
+    }
+
     const reviewsCol = collection(db, 'reviews');
     await addDoc(reviewsCol, {
         ...reviewData,

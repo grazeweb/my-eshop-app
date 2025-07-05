@@ -24,23 +24,24 @@ interface ProductReviewsProps {
   productId: string;
   reviews: Review[];
   reviewsLoading: boolean;
+  hasPurchased: boolean;
+  purchaseStatusLoading: boolean;
 }
 
-const StarRating = ({ rating, size = 'md' }: { rating: number, size?: 'sm' | 'md' }) => {
+const StarRating = ({ rating, setRating, size = 'md' }: { rating: number, setRating?: (rating: number) => void, size?: 'sm' | 'md' }) => {
   const starSize = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
   return (
     <div className="flex items-center gap-1">
       {[...Array(5)].map((_, i) => (
-        <Star
-          key={i}
-          className={`${starSize} ${i < Math.round(rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-        />
+        <button key={i} type="button" onClick={() => setRating?.(i + 1)} disabled={!setRating}>
+          <Star className={cn(starSize, i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300', setRating && 'cursor-pointer transition-colors hover:text-yellow-300')} />
+        </button>
       ))}
     </div>
   );
 };
 
-export function ProductReviews({ productId, reviews, reviewsLoading }: ProductReviewsProps) {
+export function ProductReviews({ productId, reviews, reviewsLoading, hasPurchased, purchaseStatusLoading }: ProductReviewsProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -50,27 +51,26 @@ export function ProductReviews({ productId, reviews, reviewsLoading }: ProductRe
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { averageRating, totalReviews } = useMemo(() => {
+  const { averageRating, totalReviews, ratingDistribution } = useMemo(() => {
     if (!reviews || reviews.length === 0) {
-      return { averageRating: 0, totalReviews: 0 };
+      const emptyDistribution = [5, 4, 3, 2, 1].map(star => ({ star, count: 0, percentage: 0 }));
+      return { averageRating: 0, totalReviews: 0, ratingDistribution: emptyDistribution };
     }
+    const totalReviews = reviews.length;
     const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
     return {
-      averageRating: totalRating / reviews.length,
-      totalReviews: reviews.length,
+      averageRating: totalRating / totalReviews,
+      totalReviews,
+      ratingDistribution: [5, 4, 3, 2, 1].map(star => {
+        const count = reviews.filter(r => r.rating === star).length;
+        return {
+          star,
+          count,
+          percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0,
+        };
+      })
     };
   }, [reviews]);
-
-  const ratingDistribution = useMemo(() => {
-    return [5, 4, 3, 2, 1].map(star => {
-      const count = reviews.filter(r => r.rating === star).length;
-      return {
-        star,
-        count,
-        percentage: totalReviews > 0 ? (count / totalReviews) * 100 : 0,
-      };
-    });
-  }, [reviews, totalReviews]);
 
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
@@ -106,8 +106,12 @@ export function ProductReviews({ productId, reviews, reviewsLoading }: ProductRe
         setIsDialogOpen(false);
 
     } catch (error) {
+        let message = 'Could not submit your review. Please try again later.';
+        if (error instanceof Error) {
+            message = error.message;
+        }
         console.error(error);
-        toast({ variant: 'destructive', title: 'Submission Failed', description: 'Could not submit your review. Please try again later.' });
+        toast({ variant: 'destructive', title: 'Submission Failed', description: message });
     } finally {
         setIsSubmitting(false);
     }
@@ -137,47 +141,57 @@ export function ProductReviews({ productId, reviews, reviewsLoading }: ProductRe
           <h4 className="font-semibold mb-2">Share your thoughts</h4>
           <p className="text-sm text-muted-foreground mb-4">If you've used this product, share your thoughts with other customers.</p>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="w-full">Write a customer review</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Write a review</DialogTitle>
-              </DialogHeader>
-              {user ? (
-                <form onSubmit={handleReviewSubmit} className="space-y-4">
-                  <div>
-                    <Label>Your rating</Label>
-                    <div className="flex items-center gap-1 mt-1">
-                      {[...Array(5)].map((_, i) => (
-                        <button key={i} type="button" onClick={() => setNewRating(i + 1)}>
-                          <Star className={cn("w-6 h-6 cursor-pointer transition-colors", i < newRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 hover:text-yellow-300')} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="review-title">Review title</Label>
-                    <Input id="review-title" placeholder="Give your review a title" value={reviewTitle} onChange={e => setReviewTitle(e.target.value)} required />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="review-content">Your review</Label>
-                    <Textarea id="review-content" placeholder="Write your thoughts here..." rows={5} value={reviewContent} onChange={e => setReviewContent(e.target.value)} required />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Submit Review
-                  </Button>
-                </form>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="mb-4">You must be logged in to write a review.</p>
-                  <Button asChild><Link href="/login">Login</Link></Button>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
+          {purchaseStatusLoading ? (
+            <Button variant="outline" className="w-full" disabled>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Checking purchase status...
+            </Button>
+            ) : (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full">Write a customer review</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Write a review</DialogTitle>
+                    </DialogHeader>
+                    {user ? (
+                        hasPurchased ? (
+                            <form onSubmit={handleReviewSubmit} className="space-y-4">
+                                <div>
+                                    <Label>Your rating</Label>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <StarRating rating={newRating} setRating={setNewRating} size="md" />
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="review-title">Review title</Label>
+                                    <Input id="review-title" placeholder="Give your review a title" value={reviewTitle} onChange={e => setReviewTitle(e.target.value)} required />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor="review-content">Your review</Label>
+                                    <Textarea id="review-content" placeholder="Write your thoughts here..." rows={5} value={reviewContent} onChange={e => setReviewContent(e.target.value)} required />
+                                </div>
+                                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Submit Review
+                                </Button>
+                            </form>
+                        ) : (
+                            <div className="text-center py-4">
+                                <p className="mb-4 text-muted-foreground">You can only write reviews for products that have been delivered.</p>
+                            </div>
+                        )
+                    ) : (
+                        <div className="text-center py-4">
+                        <p className="mb-4">You must be logged in to write a review.</p>
+                        <Button asChild><Link href="/login">Login</Link></Button>
+                        </div>
+                    )}
+                    </DialogContent>
+                </Dialog>
+            )
+          }
 
         </div>
         <div className="md:col-span-2">

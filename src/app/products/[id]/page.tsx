@@ -14,9 +14,12 @@ import { ProductReviews } from '@/components/product-reviews';
 import type { Review, Product } from '@/lib/types';
 import { listenForReviews } from '@/lib/reviews';
 import { getProduct, getProducts } from '@/lib/products';
+import { useAuth } from '@/contexts/auth-context';
+import { checkIfUserPurchasedProduct } from '@/lib/orders';
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
@@ -25,6 +28,9 @@ export default function ProductPage() {
   const [isWished, setIsWished] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [purchaseStatusLoading, setPurchaseStatusLoading] = useState(true);
 
   useEffect(() => {
     async function loadProductData() {
@@ -68,6 +74,24 @@ export default function ProductPage() {
     return () => unsubscribe();
   }, [params.id]);
 
+  useEffect(() => {
+    async function checkPurchase() {
+      // Don't check if user is not logged in.
+      if (user && product) {
+        setPurchaseStatusLoading(true);
+        const purchased = await checkIfUserPurchasedProduct(user.uid, product.id);
+        setHasPurchased(purchased);
+        setPurchaseStatusLoading(false);
+      } else {
+        // If there's no user, they definitely haven't purchased.
+        setHasPurchased(false);
+        setPurchaseStatusLoading(false);
+      }
+    }
+    checkPurchase();
+  }, [user, product]);
+
+
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => {
         const newQuantity = prev + amount;
@@ -90,8 +114,17 @@ export default function ProductPage() {
       ? selectedImage
       : "https://placehold.co/600x600.png";
 
-  const totalReviews = reviews.length;
-  const averageRating = totalReviews > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / totalReviews : 0;
+  const { totalReviews, averageRating } = useMemo(() => {
+    const totalReviews = reviews.length;
+    if (totalReviews === 0) {
+      return { totalReviews: 0, averageRating: 0 };
+    }
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    return {
+      totalReviews,
+      averageRating: totalRating / totalReviews,
+    };
+  }, [reviews]);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -183,6 +216,8 @@ export default function ProductPage() {
           productId={product.id}
           reviews={reviews}
           reviewsLoading={reviewsLoading}
+          hasPurchased={hasPurchased}
+          purchaseStatusLoading={purchaseStatusLoading}
         />
       </div>
 
