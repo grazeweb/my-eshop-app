@@ -96,18 +96,25 @@ export default function OrderDetailsPage() {
             <div className="md:col-span-2">
               <h3 className="text-lg font-semibold mb-4">Items in this Order</h3>
               <ul className="space-y-4">
-                {order.items.map((item, index) => (
-                  <li key={index} className="flex items-center gap-4">
-                    <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
-                      <Image src={item.image} alt={item.name} fill style={{objectFit:'cover'}} data-ai-hint="product image"/>
-                    </div>
-                    <div className="flex-grow">
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
-                    </div>
-                    <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
-                  </li>
-                ))}
+                {order.items.map((item, index) => {
+                  const imageSrc =
+                    item.image &&
+                    (item.image.startsWith("http://") || item.image.startsWith("https://"))
+                      ? item.image
+                      : "https://placehold.co/80x80.png";
+                  return (
+                    <li key={index} className="flex items-center gap-4">
+                      <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
+                        <Image src={imageSrc} alt={item.name} fill style={{objectFit:'cover'}} data-ai-hint="product image"/>
+                      </div>
+                      <div className="flex-grow">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                      </div>
+                      <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
             
