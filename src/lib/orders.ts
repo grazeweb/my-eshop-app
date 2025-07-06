@@ -2,6 +2,7 @@
 import { db } from './firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, getDoc, orderBy, Timestamp, onSnapshot, Unsubscribe, updateDoc } from 'firebase/firestore';
 import type { Order } from './types';
+import { updateProductStock, updateProductUnitsSold } from './products';
 
 // This type is for creating a new order, as 'id' and 'createdAt' are auto-generated.
 export type NewOrder = Omit<Order, 'id' | 'createdAt' | 'status'>;
@@ -14,6 +15,12 @@ export async function createOrder(orderData: NewOrder): Promise<string> {
     status: 'Processing',
     createdAt: serverTimestamp(),
   });
+
+  // Update stock for each item in the order
+  for (const item of orderData.items) {
+    await updateProductStock(item.id, item.quantity);
+  }
+
   return docRef.id;
 }
 
@@ -141,4 +148,14 @@ export function listenForAllOrders(
 export async function updateOrderStatus(orderId: string, status: Order['status']): Promise<void> {
     const orderRef = doc(db, 'orders', orderId);
     await updateDoc(orderRef, { status });
+
+    // If order is delivered, update the unitsSold for each product
+    if (status === 'Delivered') {
+        const order = await getOrderById(orderId);
+        if (order) {
+            for (const item of order.items) {
+                await updateProductUnitsSold(item.id, item.quantity);
+            }
+        }
+    }
 }

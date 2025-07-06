@@ -1,6 +1,6 @@
 
 import { db, storage } from './firebase';
-import { collection, query, addDoc, getDocs, getDoc, doc, onSnapshot, Unsubscribe, orderBy, where } from 'firebase/firestore';
+import { collection, query, addDoc, getDocs, getDoc, doc, onSnapshot, Unsubscribe, orderBy, where, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product, NewProduct } from './types';
 
@@ -75,4 +75,20 @@ export async function uploadProductImage(file: File): Promise<string> {
     const snapshot = await uploadBytes(storageRef, file);
     const downloadURL = await getDownloadURL(snapshot.ref);
     return downloadURL;
+}
+
+// Update product stock when an order is placed
+export async function updateProductStock(productId: string, quantitySold: number): Promise<void> {
+    const productRef = doc(db, 'products', productId);
+    await updateDoc(productRef, {
+        stock: increment(-quantitySold)
+    });
+}
+
+// Update units sold when an order is delivered
+export async function updateProductUnitsSold(productId: string, quantitySold: number): Promise<void> {
+    const productRef = doc(db, 'products', productId);
+    await updateDoc(productRef, {
+        unitsSold: increment(quantitySold)
+    });
 }

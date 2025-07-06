@@ -31,6 +31,8 @@ export default function NewProductPage() {
           images: [imageUrl],
           featured: false,
           rating: 0,
+          stock: data.stock,
+          unitsSold: 0,
       };
       await addProduct(newProductData);
       toast({ title: "Product created successfully!" });

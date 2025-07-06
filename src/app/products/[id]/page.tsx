@@ -52,26 +52,31 @@ export default function ProductPage() {
   }, [reviews]);
 
   useEffect(() => {
-    async function loadProductData() {
-        if (!params.id) return;
-        
-        const fetchedProduct = await getProduct(params.id);
-        
-        if (fetchedProduct) {
-            setProduct(fetchedProduct);
-            setSelectedImage(fetchedProduct.images?.[0] || fetchedProduct.image || '');
+    if (!params.id) return;
 
-            const allProducts = await getProducts();
+    const unsubscribe = onSnapshot(doc(db, "products", params.id), (doc) => {
+      if (doc.exists()) {
+        const fetchedProduct = { id: doc.id, ...doc.data() } as Product;
+        setProduct(fetchedProduct);
+        if (!selectedImage) {
+            setSelectedImage(fetchedProduct.images?.[0] || fetchedProduct.image || '');
+        }
+
+        // Fetch related products based on the fetched product's category
+        getProducts().then(allProducts => {
             const related = allProducts
                 .filter((p) => p.categoryId === fetchedProduct.categoryId && p.id !== fetchedProduct.id)
                 .slice(0, 4);
             setRelatedProducts(related);
-        } else {
-            console.error("Product not found");
-        }
-    }
-    loadProductData();
-  }, [params.id]);
+        });
+
+      } else {
+        console.error("Product not found");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [params.id, selectedImage]);
 
 
   useEffect(() => {
@@ -153,6 +158,14 @@ export default function ProductPage() {
     setQuantity(prev => {
         const newQuantity = prev + amount;
         if (newQuantity < 1) return 1;
+        if (product && (product.stock ?? 0) > 0 && newQuantity > product.stock) {
+          toast({
+            variant: "destructive",
+            title: "Not enough stock",
+            description: `Only ${product.stock} items available.`,
+          });
+          return product.stock;
+        }
         return newQuantity;
     });
   }
@@ -244,8 +257,9 @@ export default function ProductPage() {
             </div>
 
             <div className="flex items-stretch gap-4">
-                <Button size="lg" className="flex-grow" onClick={() => addToCart(product, quantity)}>
-                    <ShoppingCart className="mr-2 h-5 w-5" /> Add to Cart
+                <Button size="lg" className="flex-grow" onClick={() => addToCart(product, quantity)} disabled={(product.stock ?? 0) <= 0}>
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    {(product.stock ?? 0) > 0 ? 'Add to Cart' : 'Out of Stock'}
                 </Button>
                 <Button variant="outline" size="icon" className="w-12 h-auto" onClick={handleWishlistToggle}>
                     <Heart className={cn("h-6 w-6 transition-colors", isWished && "fill-destructive text-destructive")} />

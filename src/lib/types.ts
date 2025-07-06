@@ -26,6 +26,8 @@ export interface Product {
   categoryId: string;
   featured: boolean;
   rating: number;
+  stock: number;
+  unitsSold: number;
 }
 
 export type NewProduct = Omit<Product, 'id'>;

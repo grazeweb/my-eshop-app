@@ -26,6 +26,7 @@ const productFormSchema = z.object({
   price: z.coerce.number().min(0.01, "Price must be a positive number."),
   shippingFee: z.coerce.number().min(0, "Shipping fee cannot be negative."),
   categoryId: z.string().min(1, "Please select a category."),
+  stock: z.coerce.number().min(0, "Stock can't be negative.").int("Stock must be a whole number."),
   image: z.custom<FileList>()
     .refine((files) => files?.length > 0, 'An image is required.')
     .refine((files) => files?.[0]?.type?.startsWith("image/"), "Must be an image file."),
@@ -49,6 +50,7 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
       price: initialData.price,
       shippingFee: initialData.shippingFee,
       categoryId: initialData.categoryId,
+      stock: initialData.stock ?? 0,
       image: undefined,
     } : {
       name: "",
@@ -56,6 +58,7 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
       price: 0,
       shippingFee: 0,
       categoryId: "",
+      stock: 0,
       image: undefined,
     },
   });
@@ -139,6 +142,19 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
                          ))}
                        </SelectContent>
                      </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="stock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stock Quantity</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="100" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

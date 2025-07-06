@@ -60,6 +60,14 @@ export function ProductCard({ product }: { product: Product }) {
               <p className="text-sm text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</p>
             )}
           </div>
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-2">
+            <Badge variant={(product.stock ?? 0) > 0 ? "outline" : "destructive"} className="text-xs">
+              {(product.stock ?? 0) > 0 ? `${product.stock} in stock` : "Out of Stock"}
+            </Badge>
+            {(product.unitsSold ?? 0) > 0 && (
+              <p>{product.unitsSold} sold</p>
+            )}
+          </div>
         </CardContent>
       </Link>
     </Card>
