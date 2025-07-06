@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ProductForm, type ProductFormValues } from '../product-form';
+import { ProductForm, type ProductFormValues } from '../../product-form';
 import { getProduct, updateProduct, uploadProductImage } from '@/lib/products';
 import { categories } from '@/lib/data'; 
 import { useToast } from '@/hooks/use-toast';
