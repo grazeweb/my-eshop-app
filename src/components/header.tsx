@@ -92,11 +92,13 @@ export function Header() {
   const [searchTerm, setSearchTerm] = useState('');
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       router.push(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setIsMobileSearchOpen(false); // Close sheet on search
     }
   };
   
@@ -112,8 +114,10 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        
+        {/* Left side: Logo & Desktop Nav */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="mr-4 flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="font-bold text-lg">eShop</span>
           </Link>
           <nav className="hidden lg:flex items-center gap-1">
@@ -195,35 +199,9 @@ export function Header() {
           </nav>
         </div>
         
-        {/* Mobile Menu Trigger */}
-        <div className="lg:hidden">
-            <Sheet>
-                <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle Menu</span>
-                </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="flex flex-col">
-                    <SheetClose asChild>
-                        <Link href="/" className="flex items-center space-x-2 mb-6">
-                            <span className="font-bold text-xl">eShop</span>
-                        </Link>
-                    </SheetClose>
-                    <nav className="flex flex-col gap-4">
-                        {mobileNavLinks.map(link => (
-                            <SheetClose asChild key={link.label}>
-                                <Link href={link.href ?? '#'} className="text-lg text-foreground/80 transition-colors hover:text-foreground">
-                                    {link.label}
-                                </Link>
-                            </SheetClose>
-                        ))}
-                    </nav>
-                </SheetContent>
-            </Sheet>
-        </div>
-
-        <div className="flex items-center gap-2">
+        {/* Right side: Actions */}
+        <div className="flex items-center gap-1 md:gap-2">
+            {/* Desktop Search */}
             <form onSubmit={handleSearch} className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -231,9 +209,35 @@ export function Header() {
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="h-9 w-48 pl-9"
+                    className="h-9 w-32 sm:w-48 pl-9"
                 />
             </form>
+
+            {/* Mobile search */}
+            <div className="md:hidden">
+                <Sheet open={isMobileSearchOpen} onOpenChange={setIsMobileSearchOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <Search className="h-5 w-5" />
+                            <span className="sr-only">Search</span>
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="top" className="p-4">
+                        <form onSubmit={handleSearch} className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                type="search"
+                                placeholder="Search products..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10"
+                            />
+                        </form>
+                    </SheetContent>
+                </Sheet>
+            </div>
+            
+            {/* Cart Icon */}
             <Button variant="ghost" size="icon" asChild>
                 <Link href="/cart" className="relative">
                     {cartCount > 0 && (
@@ -243,27 +247,8 @@ export function Header() {
                     <span className="sr-only">Shopping Cart</span>
                 </Link>
             </Button>
-            {/* Mobile search */}
-            <Sheet>
-                <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="md:hidden">
-                        <Search className="h-5 w-5" />
-                        <span className="sr-only">Search</span>
-                    </Button>
-                </SheetTrigger>
-                <SheetContent side="top" className="p-4">
-                    <form onSubmit={handleSearch} className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder="Search products..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10"
-                        />
-                    </form>
-                </SheetContent>
-            </Sheet>
+            
+            {/* User Avatar / Login Button */}
             {user ? (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -285,12 +270,48 @@ export function Header() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             ) : (
-                <Button variant="ghost" asChild>
+                <>
+                  <Button variant="ghost" asChild className="hidden md:flex">
+                      <Link href="/login">
+                          Login
+                      </Link>
+                  </Button>
+                  <Button variant="ghost" size="icon" asChild className="md:hidden">
                     <Link href="/login">
-                        Login
+                      <User className="h-5 w-5" />
+                      <span className="sr-only">Login</span>
                     </Link>
-                </Button>
+                  </Button>
+                </>
             )}
+
+            {/* Mobile Menu Trigger */}
+            <div className="lg:hidden">
+                <Sheet>
+                    <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="flex flex-col">
+                        <SheetClose asChild>
+                            <Link href="/" className="flex items-center space-x-2 mb-6">
+                                <span className="font-bold text-xl">eShop</span>
+                            </Link>
+                        </SheetClose>
+                        <nav className="flex flex-col gap-4">
+                            {mobileNavLinks.map(link => (
+                                <SheetClose asChild key={link.label}>
+                                    <Link href={link.href ?? '#'} className="text-lg text-foreground/80 transition-colors hover:text-foreground">
+                                        {link.label}
+                                    </Link>
+                                </SheetClose>
+                            ))}
+                        </nav>
+                    </SheetContent>
+                </Sheet>
+            </div>
         </div>
       </div>
     </header>
