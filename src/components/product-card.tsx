@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardTitle } from '@/components/ui/card';
@@ -16,8 +17,8 @@ export function ProductCard({ product }: { product: Product }) {
       : "https://placehold.co/400x400.png";
 
   return (
-    <Card className="group w-full overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md">
-      <Link href={`/products/${product.id}`} className="block">
+    <Card className="group/link-card w-full overflow-hidden rounded-lg border shadow-sm transition-all hover:shadow-md group-active/link:scale-[0.97]">
+      <Link href={`/products/${product.id}`} className="block group/link">
         <div className="relative bg-muted">
           <div className="aspect-square w-full overflow-hidden">
              <Image

@@ -197,7 +197,7 @@ export default function ProductPage() {
                   key={index}
                   onClick={() => setSelectedImage(img)}
                   className={cn(
-                    'aspect-square relative rounded-md overflow-hidden border-2 transition',
+                    'aspect-square relative rounded-md overflow-hidden border-2 transition-all active:scale-95',
                     selectedImage === img ? 'border-primary' : 'border-transparent'
                   )}
                 >
@@ -224,7 +224,7 @@ export default function ProductPage() {
                 />
               ))}
             </div>
-            <a href="#reviews" className="text-sm text-muted-foreground hover:underline">
+            <a href="#reviews" className="text-sm text-muted-foreground hover:underline inline-block transition-transform active:scale-95">
               {totalReviews > 0 ? `${totalReviews} reviews` : 'No reviews yet'}
             </a>
           </div>

@@ -17,21 +17,21 @@ export function Footer() {
               Elegance in every detail. Curated collections for the modern lifestyle.
             </p>
             <div className="flex items-center gap-4">
-              <Link href="#" aria-label="Facebook" className="text-muted-foreground hover:text-foreground"><Facebook className="h-5 w-5" /></Link>
-              <Link href="#" aria-label="Twitter" className="text-muted-foreground hover:text-foreground"><Twitter className="h-5 w-5" /></Link>
-              <Link href="#" aria-label="Instagram" className="text-muted-foreground hover:text-foreground"><Instagram className="h-5 w-5" /></Link>
-              <Link href="#" aria-label="Youtube" className="text-muted-foreground hover:text-foreground"><Youtube className="h-5 w-5" /></Link>
+              <Link href="#" aria-label="Facebook" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95"><Facebook className="h-5 w-5" /></Link>
+              <Link href="#" aria-label="Twitter" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95"><Twitter className="h-5 w-5" /></Link>
+              <Link href="#" aria-label="Instagram" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95"><Instagram className="h-5 w-5" /></Link>
+              <Link href="#" aria-label="Youtube" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95"><Youtube className="h-5 w-5" /></Link>
             </div>
           </div>
 
           <div>
             <h4 className="font-semibold mb-4 uppercase text-sm tracking-wider">Quick Links</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/products" className="text-muted-foreground hover:text-foreground">All Products</Link></li>
-              <li><Link href="/products?category=apparel" className="text-muted-foreground hover:text-foreground">Apparel</Link></li>
-              <li><Link href="/products?category=accessories" className="text-muted-foreground hover:text-foreground">Accessories</Link></li>
-              <li><Link href="/products?category=footwear" className="text-muted-foreground hover:text-foreground">Footwear</Link></li>
-              <li><Link href="/cart" className="text-muted-foreground hover:text-foreground">Your Cart</Link></li>
+              <li><Link href="/products" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95">All Products</Link></li>
+              <li><Link href="/products?category=apparel" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95">Apparel</Link></li>
+              <li><Link href="/products?category=accessories" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95">Accessories</Link></li>
+              <li><Link href="/products?category=footwear" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95">Footwear</Link></li>
+              <li><Link href="/cart" className="text-muted-foreground hover:text-foreground inline-block transition-transform active:scale-95">Your Cart</Link></li>
             </ul>
           </div>
           

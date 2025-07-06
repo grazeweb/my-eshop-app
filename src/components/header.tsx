@@ -117,7 +117,7 @@ export function Header() {
         
         {/* Left side: Logo & Desktop Nav */}
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 transition-transform active:scale-95">
             <span className="font-bold text-lg">eShop</span>
           </Link>
           <nav className="hidden lg:flex items-center gap-1">
@@ -259,17 +259,24 @@ export function Header() {
                             </Avatar>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuContent align="end" className="w-56 mt-2">
+                        <DropdownMenuLabel className="font-normal">
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                            <p className="text-xs leading-none text-muted-foreground">
+                              {user.email}
+                            </p>
+                          </div>
+                        </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                             <Link href="/account">
-                                <User />
+                                <User className="mr-2 h-4 w-4" />
                                 <span>Profile</span>
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={logout}>
-                            <LogOut />
+                            <LogOut className="mr-2 h-4 w-4" />
                             <span>Log out</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -335,7 +342,7 @@ const ListItem = React.forwardRef<
           ref={ref}
           href={props.href || ''}
           className={cn(
-            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-all hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground active:scale-[0.98]',
             className
           )}
           {...props}

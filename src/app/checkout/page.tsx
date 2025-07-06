@@ -177,7 +177,7 @@ export default function CheckoutPage() {
         </form>
       ) : (
         <div className="text-center">
-            <p>Your cart is empty. <Link href="/products" className="text-primary underline">Go shopping</Link>.</p>
+            <p>Your cart is empty. <Link href="/products" className="text-primary underline inline-block transition-transform active:scale-95">Go shopping</Link>.</p>
         </div>
       )}
     </div>
