@@ -66,6 +66,12 @@ export async function addProduct(productData: NewProduct): Promise<void> {
     await addDoc(productsCol, productData);
 }
 
+// Update an existing product
+export async function updateProduct(productId: string, data: Partial<NewProduct>): Promise<void> {
+    const productRef = doc(db, "products", productId);
+    await updateDoc(productRef, data);
+}
+
 // Upload a product image and return the URL
 export async function uploadProductImage(file: File): Promise<string> {
     if (!file) {

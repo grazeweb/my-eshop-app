@@ -16,6 +16,16 @@ export default function NewProductPage() {
   const handleSubmit = async (data: ProductFormValues) => {
     setIsSubmitting(true);
     try {
+      if (!data.image || data.image.length === 0) {
+        toast({
+            variant: "destructive",
+            title: "Image is required",
+            description: "Please upload a product image.",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const imageFile = data.image[0];
       const imageUrl = await uploadProductImage(imageFile);
 

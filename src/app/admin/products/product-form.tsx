@@ -27,9 +27,7 @@ const productFormSchema = z.object({
   shippingFee: z.coerce.number().min(0, "Shipping fee cannot be negative."),
   categoryId: z.string().min(1, "Please select a category."),
   stock: z.coerce.number().min(0, "Stock can't be negative.").int("Stock must be a whole number."),
-  image: z.custom<FileList>()
-    .refine((files) => files?.length > 0, 'An image is required.')
-    .refine((files) => files?.[0]?.type?.startsWith("image/"), "Must be an image file."),
+  image: z.any().optional(),
 });
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;
@@ -177,7 +175,7 @@ export function ProductForm({ initialData, categories, onSubmit, isSubmitting }:
                     />
                   </FormControl>
                   <FormDescription>
-                    Upload the main product image.
+                    {initialData ? 'Upload a new image to replace the current one.' : 'Upload the main product image.'}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
