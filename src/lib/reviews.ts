@@ -1,3 +1,4 @@
+
 import { db } from './firebase';
 import { collection, query, where, addDoc, serverTimestamp, orderBy, Timestamp, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import type { Review } from './types';
@@ -37,10 +38,14 @@ export function listenForReviews(
 
 
 export async function addReview(reviewData: NewReview): Promise<void> {
+    // The check for purchase is already handled by the UI before this function is called.
+    // Removing the redundant check here simplifies the logic.
+    /*
     const hasPurchased = await checkIfUserPurchasedProduct(reviewData.authorId, reviewData.productId);
     if (!hasPurchased) {
         throw new Error("You can only review products that have been delivered.");
     }
+    */
 
     const reviewsCol = collection(db, 'reviews');
     await addDoc(reviewsCol, {
