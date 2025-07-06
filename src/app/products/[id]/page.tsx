@@ -13,12 +13,14 @@ import { Separator } from '@/components/ui/separator';
 import { ProductReviews } from '@/components/product-reviews';
 import type { Review, Product } from '@/lib/types';
 import { listenForReviews } from '@/lib/reviews';
-import { getProduct, getProducts } from '@/lib/products';
+import { getProducts } from '@/lib/products';
 import { useAuth } from '@/contexts/auth-context';
-import { checkIfUserPurchasedProduct, getOrderCountForUser } from '@/lib/orders';
+import { checkIfUserPurchasedProduct } from '@/lib/orders';
 import { useCart } from '@/contexts/cart-context';
 import { useToast } from '@/hooks/use-toast';
 import { listenForWishlist, addToWishlist, removeFromWishlist } from '@/lib/wishlist';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
