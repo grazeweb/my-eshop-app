@@ -103,28 +103,32 @@ export default function CheckoutPage() {
               <CardHeader>
                 <CardTitle className="text-xl">1. Shipping Information</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="John" value={shippingAddress.firstName} onChange={handleInputChange} required />
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input id="firstName" placeholder="John" value={shippingAddress.firstName} onChange={handleInputChange} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" placeholder="Doe" value={shippingAddress.lastName} onChange={handleInputChange} required />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" value={shippingAddress.lastName} onChange={handleInputChange} required />
-                </div>
-                <div className="col-span-2 space-y-2">
                   <Label htmlFor="address">Address</Label>
                   <Input id="address" placeholder="123 Main St" value={shippingAddress.address} onChange={handleInputChange} required />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" placeholder="Anytown" value={shippingAddress.city} onChange={handleInputChange} required />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input id="city" placeholder="Anytown" value={shippingAddress.city} onChange={handleInputChange} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="zip">ZIP Code</Label>
+                    <Input id="zip" placeholder="12345" value={shippingAddress.zip} onChange={handleInputChange} required />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="zip">ZIP Code</Label>
-                  <Input id="zip" placeholder="12345" value={shippingAddress.zip} onChange={handleInputChange} required />
-                </div>
-                 <div className="col-span-2 flex items-center space-x-2 pt-2">
+                <div className="flex items-center space-x-2 pt-2">
                     <Checkbox id="save-address" checked={saveAddress} onCheckedChange={(checked) => setSaveAddress(!!checked)} />
                     <Label htmlFor="save-address" className="text-sm font-normal cursor-pointer">
                         Save this address for future orders
