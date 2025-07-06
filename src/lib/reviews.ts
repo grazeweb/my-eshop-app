@@ -24,7 +24,9 @@ export function listenForReviews(
           ...data,
           createdAt: data.createdAt as Timestamp,
         } as Review;
-      }).filter(review => review.createdAt); // Filter out reviews that don't have a timestamp yet
+      });
+      // The filter was removed as it was preventing optimistically updated reviews from appearing.
+      // The UI component already handles the case where createdAt might be null temporarily.
       callback(reviews);
     },
     (error) => {
@@ -38,15 +40,6 @@ export function listenForReviews(
 
 
 export async function addReview(reviewData: NewReview): Promise<void> {
-    // The check for purchase is already handled by the UI before this function is called.
-    // Removing the redundant check here simplifies the logic.
-    /*
-    const hasPurchased = await checkIfUserPurchasedProduct(reviewData.authorId, reviewData.productId);
-    if (!hasPurchased) {
-        throw new Error("You can only review products that have been delivered.");
-    }
-    */
-
     const reviewsCol = collection(db, 'reviews');
     await addDoc(reviewsCol, {
         ...reviewData,
