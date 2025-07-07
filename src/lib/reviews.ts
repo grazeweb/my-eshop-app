@@ -1,6 +1,6 @@
 
 import { db } from './firebase';
-import { collection, query, where, addDoc, serverTimestamp, orderBy, Timestamp, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { collection, query, where, addDoc, serverTimestamp, orderBy, Timestamp, onSnapshot, Unsubscribe, getDocs, doc, updateDoc } from 'firebase/firestore';
 import type { Review } from './types';
 
 // This type is for creating a new review, as 'id' and 'createdAt' are auto-generated.
@@ -43,5 +43,18 @@ export async function addReview(reviewData: NewReview): Promise<void> {
     await addDoc(reviewsCol, {
         ...reviewData,
         createdAt: serverTimestamp(),
+    });
+
+    // Recalculate and update the product's average rating
+    const productReviewsQuery = query(reviewsCol, where('productId', '==', reviewData.productId));
+    const querySnapshot = await getDocs(productReviewsQuery);
+
+    const reviews = querySnapshot.docs.map(doc => doc.data() as Review);
+    const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+    const averageRating = reviews.length > 0 ? totalRating / reviews.length : 0;
+
+    const productRef = doc(db, 'products', reviewData.productId);
+    await updateDoc(productRef, {
+        rating: averageRating
     });
 }

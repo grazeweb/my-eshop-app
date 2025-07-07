@@ -10,7 +10,7 @@ import { Search, Loader2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { getProducts } from '@/lib/products';
+import { listenForProducts } from '@/lib/products';
 import type { Product } from '@/lib/types';
 
 export default function ProductsPage() {
@@ -21,18 +21,20 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadProducts() {
-        setLoading(true);
-        try {
-            const allProducts = await getProducts();
-            setProducts(allProducts);
-        } catch (error) {
-            console.error("Failed to fetch products:", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-    loadProducts();
+    setLoading(true);
+    const unsubscribe = listenForProducts(
+      (allProducts) => {
+        setProducts(allProducts);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Failed to fetch products:", error);
+        setLoading(false);
+      }
+    );
+    
+    // Cleanup the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
