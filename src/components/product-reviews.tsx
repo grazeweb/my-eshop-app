@@ -24,8 +24,6 @@ interface ProductReviewsProps {
   productId: string;
   reviews: Review[];
   reviewsLoading: boolean;
-  hasPurchased: boolean;
-  purchaseStatusLoading: boolean;
 }
 
 const StarRating = ({ rating, setRating, size = 'md' }: { rating: number, setRating?: (rating: number) => void, size?: 'sm' | 'md' }) => {
@@ -41,7 +39,7 @@ const StarRating = ({ rating, setRating, size = 'md' }: { rating: number, setRat
   );
 };
 
-export function ProductReviews({ productId, reviews, reviewsLoading, hasPurchased, purchaseStatusLoading }: ProductReviewsProps) {
+export function ProductReviews({ productId, reviews, reviewsLoading }: ProductReviewsProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   
@@ -141,58 +139,43 @@ export function ProductReviews({ productId, reviews, reviewsLoading, hasPurchase
           <h4 className="font-semibold mb-2">Share your thoughts</h4>
           <p className="text-sm text-muted-foreground mb-4">If you've used this product, share your thoughts with other customers.</p>
           
-          {purchaseStatusLoading ? (
-            <Button variant="outline" className="w-full" disabled>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Checking purchase status...
-            </Button>
-            ) : (
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full">Write a customer review</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Write a review</DialogTitle>
-                    </DialogHeader>
-                    {user ? (
-                        hasPurchased ? (
-                            <form onSubmit={handleReviewSubmit} className="space-y-4">
-                                <div>
-                                    <Label>Your rating</Label>
-                                    <div className="flex items-center gap-1 mt-1">
-                                        <StarRating rating={newRating} setRating={setNewRating} size="md" />
-                                    </div>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="review-title">Review title</Label>
-                                    <Input id="review-title" placeholder="Give your review a title" value={reviewTitle} onChange={e => setReviewTitle(e.target.value)} required />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label htmlFor="review-content">Your review</Label>
-                                    <Textarea id="review-content" placeholder="Write your thoughts here..." rows={5} value={reviewContent} onChange={e => setReviewContent(e.target.value)} required />
-                                </div>
-                                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Submit Review
-                                </Button>
-                            </form>
-                        ) : (
-                            <div className="text-center py-4">
-                                <p className="mb-4 text-muted-foreground">You can only write reviews for products that have been delivered.</p>
-                            </div>
-                        )
-                    ) : (
-                        <div className="text-center py-4">
-                        <p className="mb-4">You must be logged in to write a review.</p>
-                        <Button asChild><Link href="/login">Login</Link></Button>
-                        </div>
-                    )}
-                    </DialogContent>
-                </Dialog>
-            )
-          }
-
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+              <Button variant="outline" className="w-full">Write a customer review</Button>
+              </DialogTrigger>
+              <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>Write a review</DialogTitle>
+              </DialogHeader>
+              {user ? (
+                  <form onSubmit={handleReviewSubmit} className="space-y-4">
+                      <div>
+                          <Label>Your rating</Label>
+                          <div className="flex items-center gap-1 mt-1">
+                              <StarRating rating={newRating} setRating={setNewRating} size="md" />
+                          </div>
+                      </div>
+                      <div className="space-y-1">
+                          <Label htmlFor="review-title">Review title</Label>
+                          <Input id="review-title" placeholder="Give your review a title" value={reviewTitle} onChange={e => setReviewTitle(e.target.value)} required />
+                      </div>
+                      <div className="space-y-1">
+                          <Label htmlFor="review-content">Your review</Label>
+                          <Textarea id="review-content" placeholder="Write your thoughts here..." rows={5} value={reviewContent} onChange={e => setReviewContent(e.target.value)} required />
+                      </div>
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Submit Review
+                      </Button>
+                  </form>
+              ) : (
+                  <div className="text-center py-4">
+                  <p className="mb-4">You must be logged in to write a review.</p>
+                  <Button asChild><Link href="/login">Login</Link></Button>
+                  </div>
+              )}
+              </DialogContent>
+          </Dialog>
         </div>
         <div className="md:col-span-2">
           {reviewsLoading ? (

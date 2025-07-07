@@ -15,7 +15,6 @@ import type { Review, Product } from '@/lib/types';
 import { listenForReviews } from '@/lib/reviews';
 import { getProducts } from '@/lib/products';
 import { useAuth } from '@/contexts/auth-context';
-import { checkIfUserPurchasedProduct } from '@/lib/orders';
 import { useCart } from '@/contexts/cart-context';
 import { useToast } from '@/hooks/use-toast';
 import { listenForWishlist, addToWishlist, removeFromWishlist } from '@/lib/wishlist';
@@ -37,9 +36,6 @@ export default function ProductPage() {
   const [isWished, setIsWished] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
-
-  const [hasPurchased, setHasPurchased] = useState(false);
-  const [purchaseStatusLoading, setPurchaseStatusLoading] = useState(true);
 
   const { totalReviews, averageRating } = useMemo(() => {
     const totalReviews = reviews.length;
@@ -111,22 +107,6 @@ export default function ProductPage() {
     });
 
     return () => unsubscribe();
-  }, [user, product]);
-
-
-  useEffect(() => {
-    async function checkPurchase() {
-      if (user && product) {
-        setPurchaseStatusLoading(true);
-        const purchased = await checkIfUserPurchasedProduct(user.uid, product.id);
-        setHasPurchased(purchased);
-        setPurchaseStatusLoading(false);
-      } else {
-        setHasPurchased(false);
-        setPurchaseStatusLoading(false);
-      }
-    }
-    checkPurchase();
   }, [user, product]);
 
   const handleWishlistToggle = async () => {
@@ -277,8 +257,6 @@ export default function ProductPage() {
           productId={product.id}
           reviews={reviews}
           reviewsLoading={reviewsLoading}
-          hasPurchased={hasPurchased}
-          purchaseStatusLoading={purchaseStatusLoading}
         />
       </div>
 

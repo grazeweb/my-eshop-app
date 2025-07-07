@@ -2,7 +2,6 @@
 import { db } from './firebase';
 import { collection, query, where, addDoc, serverTimestamp, orderBy, Timestamp, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import type { Review } from './types';
-import { checkIfUserPurchasedProduct } from './orders';
 
 // This type is for creating a new review, as 'id' and 'createdAt' are auto-generated.
 export type NewReview = Omit<Review, 'id' | 'createdAt'>;
