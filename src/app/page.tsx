@@ -1,5 +1,8 @@
 
+"use client";
+
 import Link from 'next/link';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
   ArrowRight,
@@ -16,6 +19,15 @@ import { ProductCard } from '@/components/product-card';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getProducts } from '@/lib/products';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import type { Product } from '@/lib/types';
 
 const teamMembers = [
   {
@@ -85,35 +97,86 @@ const shopCategories = allCategories.filter((c) =>
   categorySlugs.includes(c.id)
 ).sort((a, b) => categorySlugs.indexOf(a.id) - categorySlugs.indexOf(b.id));
 
+const heroSlides = [
+  {
+    title: "Summer Collection is Here",
+    description: "Discover the latest trends and refresh your wardrobe. High-quality fashion at unbeatable prices.",
+    image: "https://placehold.co/1600x900.png",
+    imageHint: "fashion clothes",
+    link: "/products"
+  },
+  {
+    title: "New Tech Gadgets",
+    description: "Explore the cutting-edge of technology. Upgrade your life with the latest devices.",
+    image: "https://placehold.co/1600x900.png",
+    imageHint: "tech gadgets",
+    link: "/products?category=electronics"
+  },
+  {
+    title: "Cozy Home Essentials",
+    description: "Transform your space with our curated collection of home goods.",
+    image: "https://placehold.co/1600x900.png",
+    imageHint: "home decor",
+    link: "/products?category=home-goods"
+  }
+];
 
-export default async function Home() {
-  const featuredProducts = await getProducts({ featured: true });
+export default function Home() {
+  const [featuredProducts, setFeaturedProducts] = React.useState<Product[]>([]);
+  const plugin = React.useRef(
+    Autoplay({ delay: 5000, stopOnInteraction: true })
+  );
+
+  React.useEffect(() => {
+    async function fetchFeaturedProducts() {
+      const products = await getProducts({ featured: true });
+      setFeaturedProducts(products);
+    }
+    fetchFeaturedProducts();
+  }, []);
 
   return (
     <div className="flex flex-col gap-16 md:gap-24 pb-12">
-      <section className="relative h-[60vh] md:h-[70vh] w-full flex items-center justify-center text-center text-white bg-gray-800">
-        <Image
-          src="https://placehold.co/1600x900.png"
-          alt="Promotional background"
-          fill
-          style={{ objectFit: 'cover' }}
-          className="absolute inset-0 z-0 opacity-40"
-          data-ai-hint="fashion clothes"
-        />
-        <div className="relative z-10 p-4">
-          <h1 className="text-4xl md:text-6xl font-headline font-bold drop-shadow-lg">
-            Summer Collection is Here
-          </h1>
-          <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md">
-            Discover the latest trends and refresh your wardrobe. High-quality
-            fashion at unbeatable prices.
-          </p>
-          <Button size="lg" className="mt-8" asChild>
-            <Link href="/products">
-              Shop Now <ArrowRight className="ml-2" />
-            </Link>
-          </Button>
-        </div>
+      <section className="relative w-full">
+        <Carousel
+          plugins={[plugin.current]}
+          onMouseEnter={plugin.current.stop}
+          onMouseLeave={plugin.current.reset}
+          className="w-full"
+          opts={{ loop: true }}
+        >
+          <CarouselContent>
+            {heroSlides.map((slide, index) => (
+              <CarouselItem key={index}>
+                <div className="relative h-[60vh] md:h-[70vh] w-full flex items-center justify-center text-center text-white bg-gray-800">
+                  <Image
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="absolute inset-0 z-0 opacity-40"
+                    data-ai-hint={slide.imageHint}
+                  />
+                  <div className="relative z-10 p-4">
+                    <h1 className="text-4xl md:text-6xl font-headline font-bold drop-shadow-lg">
+                      {slide.title}
+                    </h1>
+                    <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto drop-shadow-md">
+                      {slide.description}
+                    </p>
+                    <Button size="lg" className="mt-8" asChild>
+                      <Link href={slide.link}>
+                        Shop Now <ArrowRight className="ml-2" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex" />
+          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden md:flex" />
+        </Carousel>
       </section>
 
       <section className="container mx-auto px-4">
