@@ -24,7 +24,7 @@ const teamMembers = [
     quote:
       'As the founder, my vision was to create a seamless and elegant shopping experience. Everything you see here started with a passion for quality and style.',
     avatar: 'S',
-    avatarImage: '',
+    avatarImage: 'https://placehold.co/100x100.png',
   },
   {
     name: 'Asra',
@@ -135,18 +135,11 @@ export default async function Home() {
         <h2 className="text-3xl font-bold text-center font-headline mb-12">
           Meet Our Team
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {teamMembers.map((member, index) => (
-            <Card key={index} className="flex flex-col">
+            <Card key={index} className="flex flex-col text-center transition-all hover:shadow-lg hover:-translate-y-1">
               <CardContent className="p-8 flex flex-col flex-grow">
-                <div className="flex-grow">
-                  <Quote className="h-16 w-16 text-gray-200 dark:text-gray-700 mb-4" />
-                  <p className="text-lg text-muted-foreground mb-6">
-                    "{member.quote}"
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 mt-auto">
-                  <Avatar>
+                 <Avatar className="w-24 h-24 mx-auto mb-4">
                     {member.avatarImage ? (
                       <AvatarImage
                         src={member.avatarImage}
@@ -156,12 +149,15 @@ export default async function Home() {
                     ) : null}
                     <AvatarFallback>{member.avatar}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="font-semibold">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">
+                <div className="flex-grow">
+                   <p className="font-semibold text-lg">{member.name}</p>
+                    <p className="text-sm text-primary mb-4">
                       {member.role}
                     </p>
-                  </div>
+                  <Quote className="h-6 w-6 text-gray-300 dark:text-gray-600 mb-2 mx-auto" />
+                  <p className="text-sm text-muted-foreground">
+                    "{member.quote}"
+                  </p>
                 </div>
               </CardContent>
             </Card>
