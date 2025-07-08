@@ -174,20 +174,17 @@ export default async function Home() {
         <h2 className="text-3xl font-bold text-center font-headline mb-12">
           Our Services
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-8 gap-x-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {services.map((service, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center text-center gap-2"
-            >
-              <div className="bg-muted p-4 rounded-full">
-                <service.icon className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold mt-2 text-sm md:text-base">{service.title}</h3>
-              <p className="text-xs md:text-sm text-muted-foreground">
-                {service.description}
-              </p>
-            </div>
+            <Card key={index} className="text-center flex flex-col items-center p-6 transition-all hover:border-primary hover:shadow-lg">
+                <div className="bg-muted p-4 rounded-full mb-4">
+                  <service.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-semibold text-base">{service.title}</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {service.description}
+                </p>
+            </Card>
           ))}
         </div>
       </section>
