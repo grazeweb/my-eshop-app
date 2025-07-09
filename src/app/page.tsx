@@ -12,6 +12,8 @@ import {
   Headset,
   Undo2,
   CircleDollarSign,
+  Instagram,
+  Youtube,
 } from 'lucide-react';
 import { categories as allCategories } from '@/lib/data';
 import Image from 'next/image';
@@ -37,6 +39,10 @@ const teamMembers = [
       'As the founder, my vision was to create a seamless and elegant shopping experience. Everything you see here started with a passion for quality and style.',
     avatar: 'S',
     avatarImage: 'https://placehold.co/100x100.png',
+    socials: {
+      instagram: 'https://instagram.com',
+      youtube: 'https://youtube.com',
+    },
   },
   {
     name: 'Asra',
@@ -45,6 +51,10 @@ const teamMembers = [
       'My focus is on our products and making sure everything runs smoothly behind the scenes, so your shopping experience is nothing short of perfect.',
     avatar: 'A',
     avatarImage: 'https://placehold.co/100x100.png',
+     socials: {
+      instagram: 'https://instagram.com',
+      youtube: 'https://youtube.com',
+    },
   },
   {
     name: 'Yusra',
@@ -53,6 +63,10 @@ const teamMembers = [
       "I'm here to support our team and you. From organizing tasks to addressing user needs, I help keep everything coordinated and on track.",
     avatar: 'Y',
     avatarImage: 'https://placehold.co/100x100.png',
+     socials: {
+      instagram: 'https://instagram.com',
+      youtube: 'https://youtube.com',
+    },
   },
   {
     name: 'Shammer',
@@ -61,6 +75,10 @@ const teamMembers = [
       'As a dedicated member of the team, I contribute to building and continuously improving the website to make it better for our users every day.',
     avatar: 'S',
     avatarImage: 'https://placehold.co/100x100.png',
+     socials: {
+      instagram: 'https://instagram.com',
+      youtube: 'https://youtube.com',
+    },
   },
 ];
 
@@ -198,34 +216,51 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center font-headline mb-12">
           Meet Our Team
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {teamMembers.map((member, index) => (
-            <Card key={index} className="flex flex-col text-center transition-all hover:shadow-lg hover:-translate-y-1">
-              <CardContent className="p-8 flex flex-col flex-grow">
-                 <Avatar className="w-24 h-24 mx-auto mb-4">
-                    {member.avatarImage ? (
-                      <AvatarImage
-                        src={member.avatarImage}
-                        alt={member.name}
-                        data-ai-hint="person portrait"
-                      />
-                    ) : null}
-                    <AvatarFallback>{member.avatar}</AvatarFallback>
-                  </Avatar>
-                <div className="flex-grow">
-                   <p className="font-semibold text-lg">{member.name}</p>
-                    <p className="text-sm text-primary mb-4">
-                      {member.role}
-                    </p>
-                  <Quote className="h-6 w-6 text-gray-300 dark:text-gray-600 mb-2 mx-auto" />
-                  <p className="text-sm text-muted-foreground">
-                    "{member.quote}"
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Carousel
+          opts={{ align: "start" }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-4">
+            {teamMembers.map((member, index) => (
+              <CarouselItem key={index} className="pl-4 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+                <Card className="h-full flex flex-col text-center transition-all hover:shadow-lg hover:-translate-y-1">
+                  <CardContent className="p-8 flex flex-col flex-grow">
+                    <Avatar className="w-24 h-24 mx-auto mb-4">
+                      {member.avatarImage ? (
+                        <AvatarImage
+                          src={member.avatarImage}
+                          alt={member.name}
+                          data-ai-hint="person portrait"
+                        />
+                      ) : null}
+                      <AvatarFallback>{member.avatar}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-grow">
+                      <p className="font-semibold text-lg">{member.name}</p>
+                      <p className="text-sm text-primary mb-4">
+                        {member.role}
+                      </p>
+                      <Quote className="h-6 w-6 text-gray-300 dark:text-gray-600 mb-2 mx-auto" />
+                      <p className="text-sm text-muted-foreground">
+                        "{member.quote}"
+                      </p>
+                    </div>
+                    <div className="mt-6 flex justify-center gap-4">
+                      <Link href={member.socials.instagram} target="_blank" aria-label={`${member.name}'s Instagram`} className="text-muted-foreground hover:text-primary transition-colors">
+                        <Instagram className="h-6 w-6" />
+                      </Link>
+                      <Link href={member.socials.youtube} target="_blank" aria-label={`${member.name}'s YouTube`} className="text-muted-foreground hover:text-primary transition-colors">
+                        <Youtube className="h-6 w-6" />
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="absolute left-[-1rem] top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
+          <CarouselNext className="absolute right-[-1rem] top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
+        </Carousel>
       </section>
 
       {/* Our Services */}
