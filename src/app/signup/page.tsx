@@ -26,11 +26,25 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
+      if (email.toLowerCase() === 'admin@eshop.com' && name.toLowerCase() !== 'admin') {
+          toast({
+              variant: 'destructive',
+              title: 'Invalid Admin Name',
+              description: 'Please use "admin" as the name for the admin account.',
+          });
+          setLoading(false);
+          return;
+      }
+        
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       if (user) {
         await updateProfile(user, { displayName: name });
-        await createUserProfile(user, name);
+        await createUserProfile(user.uid, {
+            id: user.uid,
+            displayName: name,
+            email: user.email!,
+        });
       }
       toast({
         title: "Account Created",

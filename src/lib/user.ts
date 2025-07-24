@@ -4,19 +4,14 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import type { UserProfile, ShippingAddress } from './types';
-import type { User } from 'firebase/auth';
 
 // Function to create a user profile document in Firestore
-export async function createUserProfile(user: User, displayName: string): Promise<void> {
-    const userRef = doc(db, 'users', user.uid);
+export async function createUserProfile(userId: string, profileData: Omit<UserProfile, 'address'>): Promise<void> {
+    const userRef = doc(db, 'users', userId);
     const docSnap = await getDoc(userRef);
 
     if (!docSnap.exists()) {
-        await setDoc(userRef, {
-            id: user.uid,
-            displayName: displayName,
-            email: user.email,
-        });
+        await setDoc(userRef, profileData);
     }
 }
 
