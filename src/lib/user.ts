@@ -2,7 +2,7 @@
 'use server';
 
 import { db } from './firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, onSnapshot, Unsubscribe, query } from 'firebase/firestore';
 import type { UserProfile, ShippingAddress } from './types';
 
 // Function to create a user profile document in Firestore
@@ -34,4 +34,29 @@ export async function saveUserAddress(userId: string, address: ShippingAddress):
     const userRef = doc(db, 'users', userId);
     // Use set with merge:true to create doc if it doesn't exist, or update if it does.
     await setDoc(userRef, { address }, { merge: true });
+}
+
+// Listen for all user profiles (for admin)
+export function listenForAllUserProfiles(
+  callback: (profiles: UserProfile[]) => void,
+  onError: (error: Error) => void
+): Unsubscribe {
+  const usersCol = collection(db, 'users');
+  const q = query(usersCol);
+
+  const unsubscribe = onSnapshot(q,
+    (querySnapshot) => {
+      const profiles = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as UserProfile));
+      callback(profiles);
+    },
+    (error) => {
+      console.error("Error listening for user profiles:", error);
+      onError(error);
+    }
+  );
+
+  return unsubscribe;
 }
