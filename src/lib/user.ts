@@ -1,6 +1,4 @@
 
-'use server';
-
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, onSnapshot, Unsubscribe, query } from 'firebase/firestore';
 import type { UserProfile, ShippingAddress } from './types';
