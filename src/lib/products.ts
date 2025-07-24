@@ -1,6 +1,6 @@
 
 import { db, storage } from './firebase';
-import { collection, query, addDoc, getDocs, getDoc, doc, onSnapshot, Unsubscribe, orderBy, where, updateDoc, increment } from 'firebase/firestore';
+import { collection, query, addDoc, getDocs, getDoc, doc, onSnapshot, Unsubscribe, orderBy, where, updateDoc, increment, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Product, NewProduct } from './types';
 
@@ -70,6 +70,12 @@ export async function addProduct(productData: NewProduct): Promise<void> {
 export async function updateProduct(productId: string, data: Partial<NewProduct>): Promise<void> {
     const productRef = doc(db, "products", productId);
     await updateDoc(productRef, data);
+}
+
+// Delete a product
+export async function deleteProduct(productId: string): Promise<void> {
+    const productRef = doc(db, 'products', productId);
+    await deleteDoc(productRef);
 }
 
 // Upload a product image and return the URL
