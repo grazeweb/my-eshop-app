@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview AI policy generation flow.
@@ -32,7 +33,6 @@ const policyGeneratorPrompt = ai.definePrompt({
 Generate a comprehensive {{policyType}} policy for an online store called "eShop".
 The policy should be professional, easy to understand, and cover all the essential aspects for an online retailer.
 Provide the output as a single block of text.
-At the end of the policy, include a line that says "This policy was generated on {{currentDate}}."
 `,
 });
 
@@ -43,14 +43,7 @@ const policyGeneratorFlow = ai.defineFlow(
     outputSchema: GeneratePolicyOutputSchema,
   },
   async (input) => {
-    const currentDate = new Date().toLocaleDateString();
-    
-    const {output} = await policyGeneratorPrompt({
-        ...input,
-        // @ts-ignore
-        currentDate,
-    });
-    
+    const {output} = await policyGeneratorPrompt(input);
     return output!;
   }
 );
