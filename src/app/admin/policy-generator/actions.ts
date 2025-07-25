@@ -1,36 +1,77 @@
+'use server';
+/**
+ * @fileOverview AI policy generation flow.
+ *
+ * - generatePolicy - A function that handles the policy generation process.
+ * - GeneratePolicyInput - The input type for the generatePolicy function.
+ * - GeneratePolicyOutput - The return type for the generatePolicy function.
+ */
 
-"use server";
+import {ai} from '@/ai/genkit';
+import {z} from 'genkit';
 
-const mockPolicies = {
-    terms: `Generated Terms & Conditions:
-1.  **Acceptance of Terms**: By accessing and using eShop, you agree to be bound by these Terms and Conditions.
-2.  **User Accounts**: To access certain features, you must register for an account. You are responsible for maintaining the confidentiality of your account information.
-3.  **Product Information**: We strive to be as accurate as possible in product descriptions. However, we do not warrant that product descriptions are error-free.
-4.  **Governing Law**: These terms shall be governed by the laws of the land.`,
-    privacy: `Generated Privacy Policy:
-1.  **Information Collection**: We collect personal information you provide to us, such as name, email, and shipping address, when you create an account or place an order.
-2.  **Use of Information**: Your information is used to process transactions, provide customer service, and personalize your shopping experience.
-3.  **Data Security**: We implement security measures to protect your personal information.
-4.  **Third-Party Disclosure**: We do not sell, trade, or otherwise transfer your personally identifiable information to outside parties without your consent.`,
-    returns: `Generated Return Policy:
-1.  **Return Window**: Items can be returned within 30 days of receipt.
-2.  **Eligibility**: To be eligible for a return, items must be unused, in the same condition you received them, and in the original packaging.
-3.  **Refund Process**: Once we receive and inspect your return, we will process your refund. The refund will be applied to your original method of payment.
-4.  **Shipping Costs**: You will be responsible for paying for your own shipping costs for returning your item. Shipping costs are non-refundable.`,
-};
+const GeneratePolicyInputSchema = z.object({
+  policyType: z.enum(['terms', 'privacy', 'returns']),
+});
+export type GeneratePolicyInput = z.infer<typeof GeneratePolicyInputSchema>;
+
+const GeneratePolicyOutputSchema = z.object({
+  policy: z.string(),
+});
+export type GeneratePolicyOutput = z.infer<typeof GeneratePolicyOutputSchema>;
+
+const policyGeneratorPrompt = ai.definePrompt({
+  name: 'policyGeneratorPrompt',
+  input: {
+    schema: GeneratePolicyInputSchema,
+  },
+  output: {
+    schema: GeneratePolicyOutputSchema,
+  },
+  prompt: `You are a legal expert specializing in e-commerce.
+Generate a comprehensive {{policyType}} policy for an online store called "eShop".
+The policy should be professional, easy to understand, and cover all the essential aspects for an online retailer.
+Provide the output as a single block of text.
+At the end of the policy, include a line that says "This policy was generated on {{currentDate}}."
+`,
+});
+
+const policyGeneratorFlow = ai.defineFlow(
+  {
+    name: 'policyGeneratorFlow',
+    inputSchema: GeneratePolicyInputSchema,
+    outputSchema: GeneratePolicyOutputSchema,
+  },
+  async (input) => {
+    const currentDate = new Date().toLocaleDateString();
+    
+    const {output} = await policyGeneratorPrompt({
+        ...input,
+        // @ts-ignore
+        currentDate,
+    });
+    
+    return output!;
+  }
+);
+
 
 export async function generatePolicy(prevState: any, formData: FormData) {
-  const policyType = formData.get('policyType') as keyof typeof mockPolicies;
+  const policyType = formData.get('policyType') as 'terms' | 'privacy' | 'returns';
 
-  // Simulate network delay and AI generation time
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  if (policyType && mockPolicies[policyType]) {
-    return {
-      ...prevState,
-      [policyType]: mockPolicies[policyType],
-    };
+  if (!policyType) {
+    return { ...prevState, error: 'Policy type is required.' };
   }
 
-  return prevState;
+  try {
+    const result = await policyGeneratorFlow({ policyType });
+    return {
+      ...prevState,
+      [policyType]: result.policy,
+      error: null,
+    };
+  } catch (error) {
+    console.error(error);
+    return { ...prevState, error: 'Failed to generate policy. Please try again.' };
+  }
 }
