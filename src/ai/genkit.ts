@@ -7,9 +7,7 @@ import { configureGenkit } from '@genkit-ai/ai';
 
 configureGenkit({
   plugins: [
-    googleAI({
-      apiVersion: 'v1beta',
-    }),
+    googleAI(),
   ],
   logLevel: 'debug',
   enableTracingAndMetrics: true,
