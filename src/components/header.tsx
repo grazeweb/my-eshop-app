@@ -67,7 +67,7 @@ const accessoriesComponents: { title: string; href: string; description: string 
     description: 'From backpacks to handbags, find the perfect carryall.',
   },
   {
-    title: 'Belts',
+    title: 'Belt',
     href: '/products?category=accessories&subcategory=belts',
     description: 'Add the finishing touch to your outfit with a stylish belt.',
   },
