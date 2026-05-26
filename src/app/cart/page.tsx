@@ -14,7 +14,6 @@ export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartTotal, shippingTotal } = useCart();
 
   const total = cartTotal + shippingTotal;
-
   if (cartItems.length === 0) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
