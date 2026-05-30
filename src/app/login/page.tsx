@@ -12,7 +12,7 @@ import { Package, Loader2 } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
-123
+12
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
